@@ -1,0 +1,25 @@
+attributes:
+  repo_username:
+    value: 'getty'
+    label: 'Midokura Repo User'
+    description: 'Username for Midokura repositories'
+    weight: 25
+    type: "text"
+  repo_password:
+    value: 'getty'
+    label: 'Midokura Repo Password'
+    description: 'Password for Midokura repositories'
+    weight: 35
+    type: "password"
+  bgb1_iface:
+    value: ''
+    label: 'BGP VLAN'
+    description: 'VLAN interface for BGP peering'
+    weight: 45
+    type: "text"
+  bgb2_iface:
+    value: ''
+    label: 'BGP VLAN'
+    description: 'VLAN interface for BGP peering'
+    weight: 45
+    type: "text"

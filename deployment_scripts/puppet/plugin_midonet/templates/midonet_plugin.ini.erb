@@ -1,0 +1,11 @@
+[DATABASE]
+sql_connection = <%= @sql_connection %> 
+sql_max_retries = 100
+
+[MIDONET]
+midonet_uri = http://<%= scope.lookupvar('::midonet_api_address') %>:8081/midonet-api
+username = <%= scope.lookupvar('::access_hash')['user'] %>
+password = <%= scope.lookupvar('::access_hash')['password'] %>
+project_id = <%= scope.lookupvar('::access_hash')['tenant'] %>
+auth_url = http://<%= scope.lookupvar('::service_endpoint') %>:35357/v2.0
+

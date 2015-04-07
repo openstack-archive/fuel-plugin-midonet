@@ -1,0 +1,13 @@
+[Midokura]
+name=Midokura Repo v1.5
+baseurl=http://<%= midokura_user %>:<%= midokura_password %>@yum.midokura.com/repo/rc/v1.5/RHEL/6/
+gpgcheck=0
+gpgkey=http://<%= midokura_user %>:<%= midokura_password %>@yum.midokura.com/repo/RPM­GPG­KEY­midokura
+enabled=1
+
+[Midokura­Neutron­Plugin]
+name=Midokura­Neutron­Plugin Repository
+baseurl=http://<%= midokura_user %>:<%= midokura_password %>@yum.midokura.com/repo/openstack­icehouse/stable/RHEL/6/
+gpgcheck=0
+gpgkey=http://<%= midokura_user %>:<%= midokura_password %>@yum.midokura.com/repo/RPM­GPG­KEY­midokura
+enabled=1
