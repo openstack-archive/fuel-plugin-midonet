@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Code-Review+2: Dmitry Ukov <dukov@mirantis.com>
+Workflow+1: Dmitry Ukov <dukov@mirantis.com>
+Submitted-by: Jenkins
+Submitted-at: Mon, 20 Apr 2015 07:46:20 +0000
+Reviewed-on: https://review.openstack.org/175287
+Project: stackforge/fuel-plugin-midonet
+Branch: refs/heads/master
