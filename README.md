@@ -1,4 +1,4 @@
-midonet
-============
+MidoNet
+=======
 
 Plugin description
