@@ -1,12 +1,12 @@
 attributes:
   repo_username:
-    value: 'getty'
+    value: ''
     label: 'Midokura Repo User'
     description: 'Username for Midokura repositories'
     weight: 25
     type: "text"
   repo_password:
-    value: 'getty'
+    value: ''
     label: 'Midokura Repo Password'
     description: 'Password for Midokura repositories'
     weight: 35
