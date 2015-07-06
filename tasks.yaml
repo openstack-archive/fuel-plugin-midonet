@@ -9,6 +9,12 @@
     puppet_manifest: enable_ip_forward.pp
     puppet_modules: "puppet/:/etc/puppet/modules/"
     timeout: 360
+- role: '*'
+  stage: pre_deployment
+  type: shell
+  parameters:
+    cmd: ./install_midonet_module.sh
+    timeout: 360
 - role: ['midonet-gw']
   stage: post_deployment
   type: puppet
