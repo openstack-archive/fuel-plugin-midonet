@@ -18,15 +18,12 @@ module Puppet::Parser::Functions
     EOS
   ) do |argv|
     nodes_hash = argv[0]
-    role = argv[1]
     result = {}
-    ip_list = []
-    sorted_ctrls = nodes_hash.select { |node| node["role"] == role }
+    sorted_ctrls = nodes_hash
     sorted_ctrls.sort! {|a,b| a['uid'].to_i <=> b['uid'].to_i}
-#    sorted_ctrls = nodes_hash.select { |node| node["role"] == 'primary-controller' } + sorted_ctrls
     sorted_ctrls.each do |ctrl|
-        result[ctrl['fqdn']] = { 'address' => ctrl['internal_address'],
-                                 'id' => sorted_ctrls.index(ctrl)+1
+        result[ctrl['fqdn']] = { 'host' => ctrl['internal_address'],
+                                 'id' => (sorted_ctrls.index(ctrl)+1).to_s
                                }
     end
     return result

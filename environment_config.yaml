@@ -1,25 +1,23 @@
 attributes:
-  repo_username:
-    value: ''
-    label: 'Midokura Repo User'
-    description: 'Username for Midokura repositories'
-    weight: 25
-    type: "text"
-  repo_password:
-    value: ''
-    label: 'Midokura Repo Password'
-    description: 'Password for Midokura repositories'
-    weight: 35
-    type: "password"
-  bgb1_iface:
-    value: ''
-    label: 'BGP VLAN'
-    description: 'VLAN interface for BGP peering'
-    weight: 45
-    type: "text"
-  bgb2_iface:
-    value: ''
-    label: 'BGP VLAN'
-    description: 'VLAN interface for BGP peering'
-    weight: 45
-    type: "text"
+  tunnel_type:
+    type: "select"
+    weight: 10
+    value: "gre"
+    label: "Tunnel Type"
+    description: "Choose which technology MidoNet will use to encapsulate data between hosts"
+    values:
+      - data: "gre"
+        label: "GRE tunnels"
+      - data: "vxlan"
+        label: "VXLAN tunnels"
+  version:
+    type: "select"
+    weight: 20
+    value: "v2015.01"
+    label: "MidoNet version"
+    description: "Choose which version of MidoNet you want to deploy"
+    values:
+      - data: "v2015.01"
+        label: "v2015.01"
+      - data: "v2015.03"
+        label: "v2015.03"
