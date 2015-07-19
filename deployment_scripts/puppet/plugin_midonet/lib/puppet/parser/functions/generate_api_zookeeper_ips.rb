@@ -1,4 +1,4 @@
-#    Copyright 2015 Mirantis, Inc.
+#    Copyright 2015 Midokura SARL, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -12,19 +12,16 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-$fuel_settings = parseyaml($astute_settings_yaml)
-$nodes_hash = $::fuel_settings['nodes']
-$primary_controller_nodes = filter_nodes($nodes_hash,'role','primary-controller')
-$controllers = concat($primary_controller_nodes, filter_nodes($nodes_hash,'role','controller'))
-$service_endpoint              = $::fuel_settings['management_vip']
-stage { 'repos':
-    before => Stage['main']
-}
-
-
-class {'plugin_midonet::repos':
-    stage => repos,
-}
-
-class {'plugin_midonet::midonetapi':
-}
+module Puppet::Parser::Functions
+  newfunction(:generate_api_zookeeper_ips, :type => :rvalue, :doc => <<-EOS
+    This function returns Zookeper configuration hash
+    EOS
+  ) do |argv|
+    result = []
+    nodes_hash = argv[0]
+    nodes_hash.each do |zk_ip|
+      result.push({'ip' => zk_ip['internal_address']})  
+    end
+    return result
+  end
+end

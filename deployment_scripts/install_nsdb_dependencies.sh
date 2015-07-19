@@ -73,6 +73,5 @@ puppet module install midonet-cassandra
 puppet module install deric-zookeeper
 puppet module install puppetlabs-apt
 puppet module install puppetlabs-java
-puppet module install puppetlabs-tomcat
+puppet module install puppetlabs-tomcat --ignore-dependencies
 git clone git://github.com/midonet/puppet-midonet /etc/puppet/modules/midonet
-puppet module install --force midonet-neutron

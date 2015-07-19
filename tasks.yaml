@@ -1,15 +1,23 @@
 # Define the tasks to create midonet
-- id: install_midonet
-  role: [nsdb, primary-controller, controller, compute]
+- id: install_nsdb_dependencies
+  role: [nsdb]
   stage: pre_deployment/6001
   required_for: [pre_deployment_end]
   type: shell
   parameters:
-    cmd: ./install_midonet_module.sh
+    cmd: ./install_nsdb_dependencies.sh
+    timeout: 360
+- id: install_controller_dependencies
+  role: [primary-controller, controller]
+  stage: pre_deployment/6001
+  required_for: [pre_deployment_end]
+  type: shell
+  parameters:
+    cmd: ./install_controller_dependencies.sh
     timeout: 360
 - id: cassandra_and_zookeeper
   role: [nsdb]
-  stage: post_deployment/6002
+  stage: post_deployment/6001
   required_for: [deploy_end]
   type: puppet
   parameters:
@@ -25,15 +33,15 @@
     puppet_manifest: enable_ip_forward.pp
     puppet_modules: "puppet/:/etc/puppet/modules/"
     timeout: 360
-
-# - role: ['controller']
-#   stage: post_deployment
-#   type: puppet
-#   parameters:
-#     puppet_manifest: midonetapi_site.pp
-#     puppet_modules: "puppet/:/etc/puppet/modules/"
-#     timeout: 360
-#   priority: 400
+- id: midonet_api
+  role: [primary-controller, controller]
+  stage: post_deployment/6501
+  type: puppet
+  parameters:
+    puppet_manifest: api.pp
+    puppet_modules: "puppet/:/etc/puppet/modules/"
+    timeout: 360
+  priority: 400
 # - role: ['controller','midonet-gw','compute','midonet-simplegw']
 #   stage: post_deployment
 #   type: puppet

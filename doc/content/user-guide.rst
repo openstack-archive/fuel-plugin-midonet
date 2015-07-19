@@ -55,7 +55,7 @@ Reference Architecture. This is not necessary at all, but it is useful to set
 the group after the *logging* task and see the Puppet logs when the deployment
 of MidoNet tasks is deploying.
 
-### Create the group NSDB ###
+### Edit the Fuel deployment graph dependency cycle ###
 
 Create a group type for Fuel 6.1 in a yaml file called `nsdb_group.yaml` with
 the following content:
@@ -88,6 +88,42 @@ A file `./release_1/deployment_tasks.yaml` will be downloaded
 Append the `nsdb_group.yaml` file into the `deployment_tasks.yaml` one
 
         cat /tmp/nsdb_group.yaml >> ./release_1/deployment_tasks.yaml
+
+Open your favourite text editor and edit the
+'./release_1/deployment_tasks.yaml', look for the `primary-controller` id group:
+
+        - id: primary-controller
+          parameters:
+          strategy:
+          type: one_by_one
+          required_for:
+          - deploy_end
+          requires:
+          - deploy_start
+          role:
+          - primary-controller
+          type: group
+
+And replace the `requires` tag from `deploy_start` to `nsdb`:
+
+        - id: primary-controller
+          parameters:
+          strategy:
+          type: one_by_one
+          required_for:
+          - deploy_end
+          requires:
+          - nsdb
+          role:
+          - primary-controller
+          type: group
+
+Q: WHAT I HAVE DONE?
+A: MidoNet API will be deployed in the controller. To configure the API, we need
+to know the location of the ZooKeeper services. Replacing `deploy_start` to
+`nsdb` (the role that deploys Zookeeper) we will guarantee that any controller
+will always be deployed after any `nsdb` host and the API will have all the
+needed data to be deployed properly.
 
 And upload the edited `deployment-tasks` file to the release 1:
 
