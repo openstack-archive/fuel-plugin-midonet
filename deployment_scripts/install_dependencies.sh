@@ -53,15 +53,35 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
 
 EOF
 
+    cat <<EOF > /etc/yum.repos.d/midonet-third-party.repo
+[midonet-third-party]
+name=Midonet third party repo
+baseurl=http://repo.midonet.org/misc/RHEL/6/misc
+enabled=1
+gpgcheck=1
+gpgkey=http://repo.midonet.org/packages.midokura.key
+timeout=60
+EOF
+
+    gem install json
+    gem install faraday
+    # Need to set these steps for a default zookeeper installation
+    yum install -y java-1.7.0-openjdk
+    mkdir -p /usr/java
+    ln -s /etc/alternatives/jre_1.7.0 /usr/java/default
+
 fi
 
-puppet module uninstall puppetlabs-stdlib
-puppet module install ripienaar-module_data
-puppet module install midonet-cassandra
-puppet module install deric-zookeeper
-puppet module install puppetlabs-apt
-puppet module install puppetlabs-java
-puppet module install puppetlabs-tomcat --ignore-dependencies
+puppet module install ripienaar-module_data --force
+puppet module install puppetlabs-java --ignore-dependencies --force
+puppet module install puppetlabs-apt --ignore-dependencies --force
+puppet module install midonet-cassandra --ignore-dependencies --force
+puppet module install richardc-datacat --force
+puppet module install deric-zookeeper --ignore-dependencies --force
+puppet module install puppetlabs-concat --ignore-dependencies --force
+puppet module install nanliu-staging --ignore-dependencies --force
+puppet module install puppetlabs-tomcat --ignore-dependencies --force
+rm -rf /etc/puppet/modules/midonet
 git clone git://github.com/midonet/puppet-midonet /etc/puppet/modules/midonet
 
 if [[ ! -a /etc/puppet/modules/neutron/manifests/plugins/midonet.pp ]]; then
