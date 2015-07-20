@@ -20,7 +20,8 @@ $cass_hash = nodes_to_hash($nsdb_nodes, 'name', 'internal_address')
 
 class {'::midonet::zookeeper':
   servers   => values($zoo_hash),
-  server_id => $zoo_hash["${::fqdn}"]['id']
+  server_id => $zoo_hash["${::fqdn}"]['id'],
+  client_ip => $zoo_hash["${::fqdn}"]['host']
 }
 
 class {'::midonet::cassandra':

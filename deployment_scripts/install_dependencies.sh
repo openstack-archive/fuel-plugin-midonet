@@ -53,6 +53,23 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
 
 EOF
 
+    cat <<EOF > /etc/yum.repos.d/midonet-third-party.repo
+[midonet-third-party]
+name=Midonet third party repo
+baseurl=http://repo.midonet.org/misc/RHEL/6/misc
+enabled=1
+gpgcheck=1
+gpgkey=http://repo.midonet.org/packages.midokura.key
+timeout=60
+EOF
+
+    gem install json
+    gem install faraday
+    # Need to set these steps for a default zookeeper installation
+    yum install -y java-1.7.0-openjdk
+    mkdir -p /usr/java
+    ln -s /etc/alternatives/jre_1.7.0 /usr/java/default
+
 fi
 
 puppet module uninstall puppetlabs-stdlib
