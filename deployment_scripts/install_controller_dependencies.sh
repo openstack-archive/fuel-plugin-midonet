@@ -53,6 +53,18 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
 
 EOF
 
+    cat <<EOF > /etc/yum.repos.d/midonet-third-party.repo
+[midonet-third-party]
+name=Midonet third party repo
+baseurl=http://repo.midonet.org/misc/RHEL/6/misc
+enabled=1
+gpgcheck=1
+gpgkey=http://repo.midonet.org/packages.midokura.key
+timeout=60
+EOF
+
+gem install json
+
 fi
 
 puppet module uninstall puppetlabs-stdlib

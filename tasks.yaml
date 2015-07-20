@@ -1,5 +1,7 @@
-# Define the tasks to create midonet
-- id: install_nsdb_dependencies
+# 
+# Pre-deployment tasks
+#
+- id: midonet_install_nsdb_dependencies
   role: [nsdb]
   stage: pre_deployment/6001
   required_for: [pre_deployment_end]
@@ -7,7 +9,7 @@
   parameters:
     cmd: ./install_nsdb_dependencies.sh
     timeout: 360
-- id: install_controller_dependencies
+- id: midonet_install_controller_dependencies
   role: [primary-controller, controller]
   stage: pre_deployment/6001
   required_for: [pre_deployment_end]
@@ -15,71 +17,78 @@
   parameters:
     cmd: ./install_controller_dependencies.sh
     timeout: 360
-- id: cassandra_and_zookeeper
+
+# Post-deployment tasks
+- id: midonet_cassandra_and_zookeeper
   role: [nsdb]
   stage: post_deployment/6001
   required_for: [deploy_end]
   type: puppet
   parameters:
-    puppet_manifest: nsdb.pp
-    puppet_modules: "puppet/:/etc/puppet/modules/"
+    puppet_manifest: puppet/manifests/nsdb.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 360
-- id: enable_ip_forward
+- id: midonet_enable_ip_forward
   role: [nsdb, compute]
-  stage: post_deployment/4001
+  stage: post_deployment/4400
   required_for: [post_deployment_end]
   type: puppet
   parameters:
-    puppet_manifest: enable_ip_forward.pp
-    puppet_modules: "puppet/:/etc/puppet/modules/"
+    puppet_manifest: puppte/manifests/enable_ip_forward.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 360
-- id: midonet_api
-  role: [primary-controller, controller]
-  stage: post_deployment/6501
+- id: midonet_agent
+  role: [primary-controller, controller, compute]
+  stage: post_deployment/4405
   type: puppet
   parameters:
-    puppet_manifest: api.pp
-    puppet_modules: "puppet/:/etc/puppet/modules/"
+    puppet_manifest: puppet/manifests/midonet_agent.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 360
-  priority: 400
-# - role: ['controller','midonet-gw','compute','midonet-simplegw']
-#   stage: post_deployment
-#   type: puppet
+- id: midonet_deploy_api
+  role: [primary-controller, controller]
+  stage: post_deployment/4410
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet_api.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules/
+    timeout: 360
+# - id: midonet_clean_neutron
+#   role: [primary-controller]
+#   stage: post_deployment/4415
+#   type: shell
 #   parameters:
-#     puppet_manifest: midolman_site.pp
-#     puppet_modules: "puppet/:/etc/puppet/modules/"
-#     timeout: 360
-#   priority: 500
-# - role: ['controller']
-#   stage: post_deployment
-#   type: puppet
-#   parameters:
-#     puppet_manifest: controller_site.pp
-#     puppet_modules: "puppet/:/etc/puppet/modules/"
-#     timeout: 360
-#   priority: 600
-# - role: ['controller']
-#   stage: post_deployment
-#   type: puppet
-#   parameters:
-#     puppet_manifest: tunnels_site.pp
-#     puppet_modules: "puppet/:/etc/puppet/modules/"
-#     timeout: 3600
-#   priority: 800
-# - role: ['compute']
-#   stage: post_deployment
-#   type: puppet
-#   parameters:
-#     puppet_manifest: compute_site.pp
-#     puppet_modules: "puppet/:/etc/puppet/modules/"
-#     timeout: 360
-#   priority: 900
-# - role: '*'
-#   stage: post_deployment
-#   type: puppet
-#   parameters:
-#     puppet_manifest: cleanup.pp
-#     puppet_modules: "puppet/:/etc/puppet/modules/"
-#     timeout: 360
-#   priority: 1000
-#
+#     cmd: ./clean-neutron.sh
+#     timeout: 120
+- id: midonet_disable_services
+  role: [primary-controller, controller, compute]
+  stage: post_deployment/4420
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/disable-services.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 60
+- id: midonet_reconfigure_neutron
+  role: [primary-controller, controller]
+  stage: post_deployment/4430
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifest/reconfigure-neutron.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 220
+- id: midonet_recreate_neutron_db
+  role: ['primary-controller']
+  stage: post_deployment/4435
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/recreate-neutron-db.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 60
+- id: midonet_start_neutron
+  role: ['primary-controller', 'controller']
+  stage: post_deployment/4440
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/start-neutron.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 210
