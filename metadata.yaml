@@ -3,7 +3,7 @@ name: midonet
 # Human-readable name for your plugin
 title: Neutron Midonet plugin
 # Plugin version
-version: 1.0.71
+version: 1.0.72
 # Description
 description: Enable to use plugin Midonet for Neutron
 # Required fuel version
