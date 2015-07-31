@@ -2,7 +2,7 @@
 # Pre-deployment tasks
 #
 - id: midonet_install_dependencies
-  role: [primary-controller, controller, compute, nsdb]
+  role: [primary-controller, controller, compute, nsdb, midonet-gw]
   stage: pre_deployment/6001
   required_for: [pre_deployment_end]
   type: shell
