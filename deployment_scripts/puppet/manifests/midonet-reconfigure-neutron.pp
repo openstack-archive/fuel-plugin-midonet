@@ -1,6 +1,5 @@
 $fuel_settings = parseyaml($astute_settings_yaml)
 $address = hiera('management_vip')
-$m_version = $fuel_settings['midonet']['version']
 # amqp settings
 $controllers                    = hiera('controllers')
 $controller_internal_addresses  = nodes_to_hash($controllers,'name','internal_address')
@@ -100,7 +99,7 @@ class { '::neutron::server':
 
   api_workers => min($::processorcount + 0, 50 + 0),
   rpc_workers => 0,
-} ->
+}
 
 class { '::neutron::agents::dhcp':
   debug                    => false,
