@@ -10,7 +10,8 @@ $roles = node_roles($nodes_hash, hiera('uid'))
 $segment_id = $nets['net04']['L2']['segment_id']
 $vm_net_l3 = $nets['net04']['L3']
 
-$tz_type = $::fuel_settings['midonet']['tunnel_type']
+$midonet_settings = $::fuel_settings['midonet']
+$tz_type = $midonet_settings['tunnel_type']
 $vm_net = { shared => false,
             "L2" => { network_type => $tz_type,
                       router_ext => false,
@@ -21,12 +22,9 @@ $vm_net = { shared => false,
             tenant => 'admin'
           }
 
-$alloc = split($nets['net04_ext']['L3']['floating'], ':')
-$allocation_pools = "start=${alloc[0]},end=${alloc[1]}"
-
-$metadata_agent_name = $operatingsystem ? {
-  'CentOS' => 'neutron-metadata-agent'
-}
+$range_start = $midonet_settings['floating_ip_range_start']
+$range_end = $midonet_settings['floating_ip_range_end']
+$allocation_pools = "start=$range_start,end=$range_end"
 
 service { 'neutron-server':
   ensure => running,
@@ -71,13 +69,14 @@ if member($roles, 'primary-controller') {
   } ->
 
   neutron_subnet { "net04_ext__subnet":
-    ensure          => present,
-    cidr            => $nets['net04_ext']['L3']['subnet'],
-    network_name    => 'net04_ext',
-    tenant_name     => $nets['net04_ext']['tenant'],
-    gateway_ip      => $nets['net04_ext']['L3']['gateway'],
-    enable_dhcp     => $nets['net04_ext']['L3']['enable_dhcp'],
-    dns_nameservers => $nets['net04_ext']['L3']['nameservers']
+    ensure           => present,
+    cidr             => $midonet_settings['floating_cidr'],
+    network_name     => 'net04_ext',
+    tenant_name      => $nets['net04_ext']['tenant'],
+    gateway_ip       => $midonet_settings['gateway'],
+    enable_dhcp      => $nets['net04_ext']['L3']['enable_dhcp'],
+    dns_nameservers  => $nets['net04_ext']['L3']['nameservers'],
+    allocation_pools => $allocation_pools
   } ->
 
   neutron_router { 'router04':

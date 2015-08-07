@@ -1,4 +1,9 @@
 attributes:
+  metadata:
+    restrictions:
+      - condition: cluster:net_provider != 'neutron' or networking_parameters:segmentation_type != 'gre'
+        action: hide
+
   tunnel_type:
     type: "select"
     weight: 10
@@ -10,14 +15,98 @@ attributes:
         label: "GRE tunnels"
       - data: "vxlan"
         label: "VXLAN tunnels"
-  version:
-    type: "select"
-    weight: 20
-    value: "v2015.01"
-    label: "MidoNet version"
-    description: "Choose which version of MidoNet you want to deploy"
-    values:
-      - data: "v2015.01"
-        label: "v2015.01"
-      - data: "v2015.03"
-        label: "v2015.03"
+    restrictions:
+      - condition: settings:public_network_assignment.assign_to_all_nodes == false
+        action: "hide"
+
+  # Floating IP range #
+  floating_cidr:
+    value: ''
+    label: 'Public Network CIDR'
+    description: 'CIDR of the Public Network. Will override the default settings'
+    weight: 30
+    type: "text"
+    regex:
+      source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/(3[012]|[12]?[0-9])$'
+      error: 'Public Network must be a CIDR'
+
+  gateway:
+    value: ''
+    label: 'Public Gateway IP'
+    description: 'Gateway of the Public Network. Will override the default settings'
+    weight: 35
+    type: "text"
+    regex:
+      source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+      error: 'Public Network gateway must be an IP address'
+
+  floating_ip_range_start:
+    value: ''
+    label: 'Floating Range start'
+    description: 'First IP address of the Floating Range. Will override the default settings'
+    weight: 36
+    type: "text"
+    regex:
+      source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+      error: 'Floating range start value must be an IP address'
+
+  floating_ip_range_end:
+    value: ''
+    label: 'Floating Range end'
+    description: 'Last IP address of the Floating Range. Will override the default settings'
+    weight: 37
+    type: "text"
+    regex:
+      source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+      error: 'Floating range last value must be an IP address'
+
+  ## BGP Options ###
+  local_as:
+    value: ''
+    label: 'Local AS'
+    description: 'Autonomous System number'
+    weight: 55
+    type: "text"
+    regex:
+      source: '^([0-9]){5}$'
+      error: "Local AS must be an integer of 5 digits"
+
+  remote_as1:
+    value: ''
+    label: 'BGP peer 1 AS'
+    description: 'Autonomous System number of the first BGP peer'
+    weight: 65
+    type: "text"
+    regex:
+      source: '^([0-9]){5}$'
+      error: "Remote AS must be an integer of 5 digits"
+
+  remote_ip1:
+    value: ''
+    label: 'BGP peer 1 IP address'
+    description: 'IP address of the first BGP peer'
+    weight: 75
+    type: "text"
+    regex:
+      source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+      error: 'Remote BGP peer must be an IP address'
+
+  remote_as2:
+    value: ''
+    label: 'BGP peer 2 AS'
+    description: 'Autonomous System number of the second BGP peer'
+    weight: 85
+    type: "text"
+    regex:
+      source: '^$|(^([0-9]){5}$)'
+      error: "Remote AS must be an integer of 5 digits or empty"
+
+  remote_ip2:
+    value: ''
+    label: 'BGP peer 2 IP address'
+    description: 'IP address of the second BGP peer'
+    weight: 95
+    type: "text"
+    regex:
+      source: '^$|(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)'
+      error: 'Remote BGP peer must be an IP address or empty'

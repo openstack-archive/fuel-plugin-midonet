@@ -1,6 +1,5 @@
 $fuel_settings = parseyaml($astute_settings_yaml)
 $address = hiera('management_vip')
-$m_version = $fuel_settings['midonet']['version']
 # amqp settings
 $controllers                    = hiera('controllers')
 $controller_internal_addresses  = nodes_to_hash($controllers,'name','internal_address')

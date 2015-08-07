@@ -63,14 +63,16 @@ gpgkey=http://repo.midonet.org/packages.midokura.key
 timeout=60
 EOF
 
-    gem install json
-    gem install faraday
     # Need to set these steps for a default zookeeper installation
     yum install -y java-1.7.0-openjdk
     mkdir -p /usr/java
     ln -s /etc/alternatives/jre_1.7.0 /usr/java/default
-
+else
+    apt-get install -y ruby-dev
 fi
+
+gem install json
+gem install faraday
 
 puppet module install ripienaar-module_data --force
 puppet module install puppetlabs-java --ignore-dependencies --force
@@ -81,8 +83,7 @@ puppet module install deric-zookeeper --ignore-dependencies --force
 puppet module install puppetlabs-concat --ignore-dependencies --force
 puppet module install nanliu-staging --ignore-dependencies --force
 puppet module install puppetlabs-tomcat --ignore-dependencies --force
-rm -rf /etc/puppet/modules/midonet
-git clone git://github.com/midonet/puppet-midonet /etc/puppet/modules/midonet
+puppet module install midonet-midonet --ignore-dependencies --force
 
 if [[ ! -a /etc/puppet/modules/neutron/manifests/plugins/midonet.pp ]]; then
   # Apply the released patch of Neutron Puppet to allow midonet manifests
