@@ -1,5 +1,10 @@
+$service_path = $operatingsystem ? {
+  'CentOS' => '/sbin',
+  'Ubuntu' => '/usr/bin:/usr/sbin:/sbin'
+}
+
 exec {'service midolman stop':
-  path   => '/sbin'
+  path   => $service_path
 } ->
 
 exec {'/usr/bin/mm-dpctl --delete-dp ovs-system':
@@ -13,5 +18,5 @@ exec {'/usr/bin/mm-dpctl --delete-dp midonet':
 } ->
 
 exec {'service midolman start':
-  path   => '/sbin'
+  path   => $service_path
 }
