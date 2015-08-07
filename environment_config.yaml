@@ -10,14 +10,73 @@ attributes:
         label: "GRE tunnels"
       - data: "vxlan"
         label: "VXLAN tunnels"
-  version:
-    type: "select"
-    weight: 20
-    value: "v2015.01"
-    label: "MidoNet version"
-    description: "Choose which version of MidoNet you want to deploy"
-    values:
-      - data: "v2015.01"
-        label: "v2015.01"
-      - data: "v2015.03"
-        label: "v2015.03"
+
+  # Floating IP range #
+  floating_cidr:
+    value: ''
+    label: 'Public Network CIDR'
+    description: 'CIDR of the Public Network. Will override the default settings'
+    weight: 30
+    type: "text"
+    # TODO: regex
+
+  gateway:
+    value: ''
+    label: 'Public Gateway IP'
+    description: 'Gateway of the Public Network. Will override the default settings'
+    weight: 35
+    type: "text"
+    # TODO: regex
+
+  floating_ip_range_start:
+    value: ''
+    label: 'Floating Range start'
+    description: 'First IP address of the Floating Range. Will override the default settings'
+    weight: 36
+    type: "text"
+    # TODO: regex
+
+  floating_ip_range_end:
+    value: ''
+    label: 'Floating Range end'
+    description: 'Last IP address of the Floating Range. Will override the default settings'
+    weight: 37
+    type: "text"
+    # TODO: regex
+
+  ## BGP Options ###
+  local_as:
+    value: ''
+    label: 'Local AS'
+    description: 'Autonomous System number'
+    weight: 55
+    type: "text"
+    # TODO: regex integer 5 digits
+  remote_as1:
+    value: ''
+    label: 'BGP peer 1 AS'
+    description: 'Autonomous System number of the first BGP peer'
+    weight: 65
+    type: "text"
+    # TODO: regex integer 5 digits
+  remote_ip1:
+    value: ''
+    label: 'BGP peer 1 IP address'
+    description: 'IP address of the first BGP peer'
+    weight: 75
+    type: "text"
+    # TODO: ip address regex
+  remote_as2:
+    value: ''
+    label: 'BGP peer 2 AS'
+    description: 'Autonomous System number of the second BGP peer'
+    weight: 85
+    type: "text"
+    # TODO: regex integer 5 digits
+  remote_ip2:
+    value: ''
+    label: 'BGP peer 2 IP address'
+    description: 'IP address of the second BGP peer'
+    weight: 95
+    type: "text"
+    # TODO: ip address regex
