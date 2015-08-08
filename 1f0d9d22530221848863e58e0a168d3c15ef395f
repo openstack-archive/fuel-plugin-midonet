@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Code-Review+2: Jaume Devesa <devvesa@gmail.com>
+Workflow+1: Jaume Devesa <devvesa@gmail.com>
+Code-Review-1: Irina <ipovolotskaya@mirantis.com>
+Submitted-by: Jenkins
+Submitted-at: Sat, 08 Aug 2015 08:39:55 +0000
+Reviewed-on: https://review.openstack.org/203408
+Project: stackforge/fuel-plugin-midonet
+Branch: refs/heads/master
