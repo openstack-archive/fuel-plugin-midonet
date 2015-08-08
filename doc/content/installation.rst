@@ -1,35 +1,5 @@
-MidoNet Fuel Plugin User Guide
-==============================
-
-This document will guide you through the steps of install, configure and use the
-MidoNet plugin for Fuel.
-
-MidoNet version that will be deployed is v2015.03 and this plugin currently is
-only compatible with version 6.1 of Mirantis OpenStack Fuel.
-
-Terms
------
-
-Description
------------
-
-MidoNet is an Apache licensed production grade network virtualization software
-for Infrastructure-as-a-Service (IaaS) clouds. This plugin provides the puppet
-manifests to install all the components to deploy easily MidoNet with Fuel in a
-production environment.
-
-There are no prerequisites to use the MidoNet plugin: MidoNet is Open Source,
-and the plugins sets the repositories from where download and install MidoNet
-packages. Only on Fuel, you need to [#Enable Experimental Features](enable the
-experimental features).
-
-### Limitations ###
-
-The plugin is **only** compatible with OpenStack environments deployed with
-Neutron + GRE as network configuration.
-
-Installation
-------------
+Installation Guide
+------------------
 
 ### Enable Experimental Features ###
 
@@ -54,7 +24,6 @@ And restart the Nailgun container with dependencies by running:
 
 ### Install the Plugin ###
 
-
 To install the MidoNet Fuel plugin:
 
   * Download it from the [Fuel Plugins Catalog](https://www.mirantis.com/products/openstack-drivers-and-plugins/fuel-plugins/)
@@ -72,12 +41,17 @@ To install the MidoNet Fuel plugin:
         9  | midonet | 2.0.0   | 2.0.0
 
 
-After that, you'll need to create a role and a group to put the tasks on the
-Deployment Graph[3]. Read the next section to do so.
-
 ### Create the MidoNet roles ###
 
-Create a YAML file with the _NoStateDataBase_ (nsdb) definition, like this:
+MidoNet needs two roles besides the provided with Fuel: The NSDB role,
+which will install the No State DataBase services (ZooKeeper and Cassandra) and
+the Gateway one, that will provide the HA Gateway machine for inbound and
+outbound traffic of the OpenStack deployment. (See [User Guide] for more info
+about networking in MidoNet)
+
+#### NSDB ####
+
+Create a YAML file with the `nsdb` definition, like this:
 
 
         name: nsdb
@@ -96,17 +70,29 @@ And create the role for both environments (`Ubuntu 2014.2.2-6.1` and  `Centos
         $ fuel role --create --rel 1 --file nsdb.yaml
         $ fuel role --create --rel 2 --file nsdb.yaml
 
-TODO(devvesa): explain the `gateway` node.
+#### Gateway ####
 
-Then you can create the groups `nsdb` and `gateway` on the tasks. This is based
-on the *Creating a separate role and attaching a task to it[5]*  section on the
-Reference Architecture. This is not necessary at all, but it is useful to set
-the group after the *logging* task and see the Puppet logs when the deployment
-of MidoNet tasks is deploying.
+Create the role for MidoNet gateway by creating a file called `gateway.yaml`
+with the following contents:
+
+        name: midonet-gw
+        meta:
+          name: MidoNet HA Gateway
+          description: MidoNet Gateway
+        volumes_roles_mapping:
+          - allocate_size: min
+            id: os
+
+And create the role for both environments (`Ubuntu 2014.2.2-6.1` and  `Centos
+2014.2.2-6.1`) using the Fuel CLI[4]:
+
+        $ fuel role --create --rel 1 --file gateway.yaml
+        $ fuel role --create --rel 2 --file gateway.yaml
+
 
 ### Edit the Fuel deployment graph dependency cycle ###
 
-Create a group type for Fuel 6.1 in a yaml file called `nsdb_group.yaml` with
+Create a group type for Fuel 6.1 in a yaml file called `midonet_groups.yaml` with
 the following content:
 
 
@@ -126,6 +112,22 @@ the following content:
           - hiera
           - globals
           - netconfig
+        - id: midonet-gw
+          parameters:
+            strategy:
+              type: parallel
+          required_for:
+          - deploy_end
+          requires:
+          - deploy_start
+          role:
+          - midonet-gw
+          tasks:
+          - logging
+          - hiera
+          - globals
+          - netconfig
+          type: group
 
 
 Download the deployment tasks for the release 1:
@@ -134,61 +136,29 @@ Download the deployment tasks for the release 1:
 
 A file `./release_1/deployment_tasks.yaml` will be downloaded
 
-Append the `nsdb_group.yaml` file into the `deployment_tasks.yaml` one
+Append the `midonet_groups.yaml` file into the `deployment_tasks.yaml` one
 
-        cat /tmp/nsdb_group.yaml >> ./release_1/deployment_tasks.yaml
+        cat /tmp/midonet_groups.yaml >> ./release_1/deployment_tasks.yaml
 
 And upload the edited `deployment-tasks` file to the release 1:
 
         fuel rel --rel 1 --deployment-tasks --upload
 
-Do the same for **release 2**
+Do the same for **release 2**:
+
+        fuel rel --rel 2 --deployment-tasks --download
+        cat /tmp/midonet_groups.yaml >> ./release_2/deployment_tasks.yaml
+        fuel rel --rel 2 --deployment-tasks --upload
 
 Even though current plugins for 6.1 version only allow to add tasks on
 _pre\_deployment_ and _post_deployment_ stages, adding this group and these
-tasks into the main graph will allow `nsdb` to:
+tasks into the main graph will allow `nsdb` and `gateway` roles to:
 
  * Configure _logging_ to see Puppet and MCollective logs related to the tasks
    from the Fuel Web UI.
  * Access to hiera variables.
  * Access to global variables.
  * Configure the IP addresses for each Fuel network.
-
-Guide
------
-
-### Select Environment ###
-
-When creating the environment, choose Neutron with GRE on the Network tab.
-
-TODO(devvesa): add screenshot
-
-MidoNet plugin does not interact with the rest of the options, so choose
-whatever your deployment demands on them.
-
-### Enable Plugin ###
-
-You should enter Settings tab of the Fuel Web UI to do that. Please, provide
-more details here. Specially, in terms of fields/checkboxes etc
-
-Once the environment is created, enter in Settings tab of the Fuel Web UI,
-scroll down until 'Neutron MidoNet plugin' and enable the checkbox.
-
-After that, choose which encapsulation technology you want
-to use to send data between hosts on the Private network: GRE or VXLAN and one
-of the available MidoNet versions.
-
-TODO(devvesa); add screenshot
-
-### Network Configuration ###
-
-TODO(devvesa): study which Network configuration fits better with MidoNet,
-according to Neutron Neutron topologies
-(https://docs.mirantis.com/openstack/fuel/fuel-6.1/reference-architecture.html#neutron-network-topologies)
-and document it here.
-
-Appendix
---------
 
 [1]: [Enable Experimental Features](https://docs.mirantis.com/openstack/fuel/fuel-6.1/operations.html#enable-experimental-features)
 [2]: [Fuel Plugin Installation guidelines](https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#install-plugin)
