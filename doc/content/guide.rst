@@ -24,7 +24,8 @@ Fuel 6.1 reference architecture has a schema with the `networks that deploys
 
 ML2 networks:
 
-.. image:: ../images/fuelml2gre.png
+.. image:: images/fuelml2gre.png
+   :width: 100%
 
 In this schema, red network represents the Public + Floating IP range. That
 means API access to services and Virtual Machines' Floating IPs share the same
@@ -59,7 +60,8 @@ environment settings get overridden.
 
 MidoNet deployment schema:
 
-.. image:: ../images/midonet_fuel.png
+.. image:: images/midonet_fuel.png
+   :width: 100%
 
 On this schema:
 
@@ -100,7 +102,8 @@ Select Environment
 
 When creating the environment, choose Neutron with GRE on the Network tab.
 
-.. image:: ../images/gre_environment.png
+.. image:: images/gre_environment.png
+   :width: 100%
 
 MidoNet plugin does not interact with the rest of the options, so choose
 whatever your deployment demands on them.
@@ -113,7 +116,8 @@ Configure MidoNet Plugin
 Configuring the MidoNet plugin for Fuel, you will override most of the options
 of the *Public Network* section of the *Settings* tab of the environment:
 
-.. image:: ../images/overridden_options.png
+.. image:: images/overridden_options.png
+   :width: 100%
 
 Fuel will still reserve IP addresses of the *IP range* (first row) to assign
 API-accessible IPs to the OpenStack services, but the rest will be overridden by
@@ -124,11 +128,13 @@ First, you need to activate the option **Assign public networks to all nodes**.
 By default, Fuel only gives public access to Controllers. We need to enable
 this option in order to have external connectivity to Gateway Nodes.
 
-.. image:: ../images/public_to_all.png
+.. image:: images/public_to_all.png
+   :width: 100%
 
 Then, activate the plugin and fill the options:
 
-.. image:: ../images/plugin_config.png
+.. image:: images/plugin_config.png
+   :width: 100%
 
 Let's explain them:
 
@@ -163,8 +169,8 @@ Assign Roles to Nodes
 Go to the *Nodes* tab and you will see the **Network State DataBase** and
 **MidoNet HA Gateway** roles available to be assigned to roles.
 
-.. image:: ../images/nodes_to_roles.png
-
+.. image:: images/nodes_to_roles.png
+   :width: 100%
 
 Just follow one rule:
 
