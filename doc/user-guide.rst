@@ -7,9 +7,9 @@ MidoNet plugin for Fuel.
 Sections
 --------
 
-- `Plugin Description <./content/description.rst>`_
-- `Terms <./content/terms.rst>`_
-- `Installation Guide <./content/installation.rst>`_
-- `User Guide <./content/guide.rst>`_
-- `Licenses <./content/licenses.rst>`_
-- `Appendix <./content/appendix.rst>`_
+.. include:: content/description.rst
+.. include:: content/terms.rst
+.. include:: content/installation.rst
+.. include:: content/guide.rst
+.. include:: content/licenses.rst
+.. include:: content/appendix.rst

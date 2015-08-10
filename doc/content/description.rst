@@ -10,7 +10,7 @@ MidoNet version that will be deployed is v2015.06_ and this plugin currently is
 only compatible with version 6.1 of Mirantis OpenStack Fuel.
 
 There are no prerequisites to use the MidoNet plugin: MidoNet is Open Source,
-and the plugins sets the repositories from where download and install MidoNet
+and the plugin sets the repositories from where download and install MidoNet
 packages.
 
 
@@ -27,12 +27,12 @@ MidoNet plugin for Fuel 2.0.0
 Limitations
 -----------
 
-The plugin is **only** compatible with OpenStack environments deployed with
-**Neutron + GRE** as network configuration in the environment configuration
-options. However, VXLAN can be configured on the plugin settings after
-the environment creation.
+* The plugin is **only** compatible with OpenStack environments deployed with
+  **Neutron + GRE** as network configuration in the environment configuration
+  options. However, VXLAN can be configured on the plugin settings after
+  the environment creation.
 
-The plugin currently only work with CentOS 6.5 environments. We are working on
-make it work for Ubuntu environments
+* The plugin currently only works with CentOS 6.5 environments. In near future, it
+  should work for Ubuntu environments as well.
 
 .. _v2015.06: https://github.com/midonet/midonet/tree/stable/v2015.06.2

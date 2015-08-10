@@ -5,7 +5,7 @@ Enable Experimental Features
 ----------------------------
 
 To be able to install **MidoNet**, you should enable `Experimental Features`_.
-To do so, Manually modify the ``/etc/fuel/version.yaml`` file in *Fuel Master*
+To do so, manually modify the ``/etc/fuel/version.yaml`` file in *Fuel Master*
 host to add ``experimental`` to the ``feature_groups`` list in the ``VERSION``
 section, just below ``mirantis`` item:
 
@@ -39,12 +39,14 @@ To install the MidoNet Fuel plugin:
 
      [root@home ~]# scp midonet-1.0-2.0.0-1.noarch.rpm root@fuel-master:/tmp
 
-- Log into Fuel master node and install the plugin using the Fuel CLI:
+- Log into Fuel Master node and install the plugin using the
+  `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#using-fuel-cli>`_:
+
   ::
 
      [root@fuel-master ~]# fuel plugins --install midonet-1.0-2.0.0-1.noarch.rpm
 
-- Verify the plugin is installed correctly:
+- Verify that the plugin is installed correctly:
   ::
 
     [root@fuel-master ~]# fuel plugins
@@ -58,7 +60,7 @@ Create the MidoNet roles
 
 MidoNet needs two roles besides the ones provided with Fuel:
 
-- The **NSDB** role, which will install the Network State DataBase services
+- the **NSDB** role, which will install the Network State DataBase services
   (ZooKeeper and Cassandra).
 
 - the **Gateway** role, that will provide the HA Gateway machine for inbound and
@@ -82,7 +84,8 @@ Create a YAML file with the **NSDB** role definition, like this:
       id: os
 
 Name it, for instance, ``nsdb.yaml``. Push the role for both environments
-(``Ubuntu 2014.2.2-6.1`` and ``Centos 2014.2.2-6.1``) using the Fuel CLI[4]:
+(``Ubuntu 2014.2.2-6.1`` and ``Centos 2014.2.2-6.1``) using the
+`Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#using-fuel-cli>`_:
 
 ::
 
@@ -107,7 +110,8 @@ Create the role for **MidoNet Gateway** by creating a file called
       id: os
 
 And create the role for both environments (`Ubuntu 2014.2.2-6.1` and  `Centos
-2014.2.2-6.1`) using the Fuel CLI[4]:
+2014.2.2-6.1`) using the
+`Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#using-fuel-cli>`_
 
 ::
 
@@ -168,7 +172,7 @@ Download the deployment tasks for the release 1:
 
 A file ``./release_1/deployment_tasks.yaml`` will be downloaded
 
-Without moving from your current directory, Append the
+Without moving from your current directory, append the
 ``/tmp/midonet_groups.yaml`` file into the ``deployment_tasks.yaml`` one:
 
 ::
