@@ -32,4 +32,7 @@ The plugin is **only** compatible with OpenStack environments deployed with
 options. However, VXLAN can be configured on the plugin settings after
 the environment creation.
 
+The plugin currently only work with CentOS 6.5 environments. We are working on
+make it work for Ubuntu environments
+
 .. _v2015.06: https://github.com/midonet/midonet/tree/stable/v2015.06.2
