@@ -1,18 +1,18 @@
 MidoNet Fuel Plugin User Guide
 ==============================
 
-Once the Fuel MidoNet plugin has been `installed <./installation.rst>`_, you can
+Once the Fuel MidoNet plugin has been installed (following `Installation Guide`_), you can
 create *OpenStack* environments that use MidoNet SDN controller as a Neutron
 Backend.
 
 MidoNet Networks
 ----------------
 
-MidoNet changes the behaviour that people are used to see in Neutron
-deployments, and understanding what MidoNet plugin does (especially on Public
-Network Ranges), is essential to configure the plugin properly.
+MidoNet changes the behaviour of Neutron
+deployments and understanding what MidoNet plugin does (especially on Public
+Network Ranges) - this concept is essential to configure the plugin properly.
 
-MidoNet plugin is compatible using **Neutron + GRE** environment, so let's focus
+MidoNet plugin is compatible with **Neutron + GRE** environment, so let's focus
 on the deployment with ML2 first, to introduce the differences that MidoNet
 plugin has.
 
@@ -100,80 +100,89 @@ Now we are ready to create a Fuel environment that uses MidoNet.
 Select Environment
 ------------------
 
-When creating the environment, choose Neutron with GRE on the Network tab.
+#. When creating the environment in the Fuel UI wizard, choose Neutron with GRE on the Network tab.
 
-.. image:: images/gre_environment.png
-   :width: 100%
+   .. image:: images/gre_environment.png
+      :width: 100%
 
-MidoNet plugin does not interact with the rest of the options, so choose
-whatever your deployment demands on them.
+#. MidoNet plugin does not interact with the rest of the options, so choose
+   whatever your deployment demands on them. Follow instructions from
+   `the official Mirantis OpenStack documentation <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#create-a-new-openstack-environment>`_
+   to finish the configuration.
 
-Once the environment is created, enter in Settings tab of the Fuel Web UI.
+#. Once the environment is created, open the *Settings* tab of the Fuel Web UI.
 
 Configure MidoNet Plugin
 ------------------------
 
-Configuring the MidoNet plugin for Fuel, you will override most of the options
-of the *Public Network* section of the *Settings* tab of the environment:
+#. Configuring the MidoNet plugin for Fuel, you will override most of the options
+   of the *Public Network* section of the *Settings* tab of the environment:
 
-.. image:: images/overridden_options.png
-   :width: 100%
+   .. image:: images/overridden_options.png
+      :width: 100%
 
-Fuel will still reserve IP addresses of the *IP range* (first row) to assign
-API-accessible IPs to the OpenStack services, but the rest will be overridden by
-the plugin options that you are about to configure, making the Floating Network
-full-overlay and pure floating.
+   Fuel will still reserve IP addresses of the *IP range* (first row) to assign
+   API-accessible IPs to the OpenStack services, but the rest will be overridden by
+   the plugin options that you are about to configure, making the Floating Network
+   full-overlay and pure floating.
 
-First, you need to activate the option **Assign public networks to all nodes**.
-By default, Fuel only gives public access to Controllers. We need to enable
-this option in order to have external connectivity to Gateway Nodes.
+#. Activate the option **Assign public networks to all nodes**.
+   By default, Fuel only gives public access to Controllers. We need to enable
+   this option in order to have external connectivity to Gateway Nodes.
 
-.. image:: images/public_to_all.png
-   :width: 100%
+   .. image:: images/public_to_all.png
+     :width: 100%
 
-Then, activate the plugin and fill the options:
+#. Select the plugin checkbox and fill the options:
 
-.. image:: images/plugin_config.png
-   :width: 100%
+   .. image:: images/plugin_config.png
+      :width: 100%
 
-Let's explain them:
+   Let's explain them:
 
-- **Tunnel Type**: Even you have chosen GRE tunnels on environment creation,
-  this is a convention because the deployment that Fuel does by default is the
-  closest to the MidoNet plugin one. Here you can choose between GRE or VXLAN as
-  tunneling technology.
+   - **Tunnel Type**: Even you have chosen GRE tunnels on environment creation,
+     this is a convention because the deployment that Fuel does by default is the
+     closest to the MidoNet plugin one. Here you can choose between GRE or VXLAN as
+     tunneling technology.
 
-- **Public Network CIDR**: This option will be the CIDR of Neutron's External
-  Network. This range **MUST NOT** be the same as the *Public Network* section
-  of the *Settings* tab of the environment. There is no way to control this from
-  the plugin development, so this restriction is all up to you!
+   - **Public Network CIDR**: This option will be the CIDR of Neutron's External
+     Network. This range **MUST NOT** be the same as the *Public Network* section
+     of the *Settings* tab of the environment. There is no way to control this from
+     the plugin development, so this restriction is all up to you!
 
-- **Public Gateway IP**: The IP address of the *Public Network CIDR*. It will be
-  the Gateway IP address of the MidoNet Virtual network. This IP address can not
-  be in the next section's range. . Recommendation: put the first IP address of
-  the CIDR. There is no way to control that this IP belongs to the CIDR in from
-  the plugin development, so be aware on the value you are setting.
+   - **Public Gateway IP**: The IP address of the *Public Network CIDR*. It will be
+     the Gateway IP address of the MidoNet Virtual network. This IP address can not
+     be in the next section's range. . Recommendation: put the first IP address of
+     the CIDR. There is no way to control that this IP belongs to the CIDR in from
+     the plugin development, so be aware on the value you are setting.
 
-- **Floating Range Start** and **Floating Range End**: First and last IP address
-  of the Floating range of IPs available to be used on Virtual Machines.
+   - **Floating Range Start** and **Floating Range End**: First and last IP address
+     of the Floating range of IPs available to be used on Virtual Machines.
 
-- **Local AS** Your Autonomous System number to establish a BGP connection.
+   - **Local AS** Your Autonomous System number to establish a BGP connection.
 
-- **BGP Peer X AS** and **BGP X IP Address**: Information needed to establish a
-  BGP connection to remote peers.
+   - **BGP Peer X AS** and **BGP X IP Address**: Information needed to establish a
+     BGP connection to remote peers.
 
 
 Assign Roles to Nodes
 ---------------------
 
-Go to the *Nodes* tab and you will see the **Network State DataBase** and
-**MidoNet HA Gateway** roles available to be assigned to roles.
+#. Go to the *Nodes* tab and you will see the **Network State DataBase** and
+   **MidoNet HA Gateway** roles available to be assigned to roles.
 
-.. image:: images/nodes_to_roles.png
-   :width: 100%
+   .. image:: images/nodes_to_roles.png
+      :width: 100%
 
-Just follow one rule:
+#. Just follow one rule:
 
-- **DO NOT** assign the role **Gateway** and the role **Controller** altogether.
+   - **DO NOT** assign the role **Gateway** and the role **Controller** altogether.
 
-**NSDB** role can be combined with any other role.
+   - **NSDB** role can be combined with any other role.
+
+Finish environment configuration
+--------------------------------
+
+#. Run `network verification check <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#verify-networks>`_
+
+#. Press `Deploy button <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#deploy-changes>`_ to once you are done with environment configuration.
