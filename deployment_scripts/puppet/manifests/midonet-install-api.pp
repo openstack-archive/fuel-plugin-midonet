@@ -14,7 +14,9 @@ $mido_repo = $operatingsystem ? {
 }
 
 class {'::midonet::repository':
-  midonet_repo => $mido_repo
+  midonet_repo       => $mido_repo,
+  manage_distro_repo => false,
+  openstack_release  => 'juno'
 } ->
 
 class {'::midonet::midonet_api':
