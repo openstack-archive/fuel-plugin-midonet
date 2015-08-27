@@ -2,6 +2,7 @@ $fuel_settings = parseyaml($astute_settings_yaml)
 $management_address = hiera('management_vip')
 $username = $fuel_settings['access']['user']
 $password = $fuel_settings['access']['password']
+$tenant_name = $fuel_settings['access']['tenant']
 $midonet_settings = $fuel_settings['midonet-fuel-plugin']
 $gateway_nodes = filter_nodes($fuel_settings['nodes'], 'role', 'midonet-gw')
 $gateways_hash_ips = nodes_to_hash($gateway_nodes, 'name', 'public_address')
@@ -68,6 +69,7 @@ midonet_gateway { $::fqdn:
   midonet_api_url => "http://${management_address}:8081/midonet-api",
   username        => $username,
   password        => $password,
+  tenant_name     => $tenant_name,
   interface       => 'gw-veth-mn',
   local_as        => $midonet_settings['local_as'],
   bgp_port        => { 'port_address' => $gw_ip, 'net_prefix' => $net_hash['network_address'], 'net_length' => $net_hash['mask']},

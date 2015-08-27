@@ -24,9 +24,11 @@ class {'::midonet::midonet_api':
   keystone_auth        => true,
   keystone_host        => $::fuel_settings['management_vip'],
   keystone_admin_token => $::fuel_settings['keystone']['admin_token'],
+  keystone_tenant_name => $::fuel_settings['access']['tenant'],
   bind_address         => $::ipaddress_br_mgmt,
   api_ip               => $::fuel_settings['public_vip'],
-  api_port             => '8081'
+  api_port             => '8081',
+  require              => Class['::midonet::repository']
 }
 
 # HA proxy configuration

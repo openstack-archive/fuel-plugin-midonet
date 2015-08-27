@@ -18,15 +18,29 @@ $nsdb_nodes = filter_nodes($all_nodes, 'role', 'nsdb')
 $zoo_hash = generate_zookeeper_hash($nsdb_nodes)
 $cass_hash = nodes_to_hash($nsdb_nodes, 'name', 'internal_address')
 
+$m_version = 'v2015.06'
+$mido_repo = $operatingsystem ? {
+  'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
+  'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+}
+
+class {'::midonet::repository':
+  midonet_repo       => $mido_repo,
+  manage_distro_repo => false,
+  openstack_release  => 'juno'
+}
+
 class {'::midonet::zookeeper':
   servers   => values($zoo_hash),
   server_id => $zoo_hash["${::fqdn}"]['id'],
-  client_ip => $zoo_hash["${::fqdn}"]['host']
+  client_ip => $zoo_hash["${::fqdn}"]['host'],
+  require   => Class['::midonet::repository']
 }
 
 class {'::midonet::cassandra':
   seeds        => values($cass_hash),
-  seed_address => $cass_hash["${::hostname}"]
+  seed_address => $cass_hash["${::hostname}"],
+  require   => Class['::midonet::repository']
 }
 
 firewall {'500 zookeeper ports':

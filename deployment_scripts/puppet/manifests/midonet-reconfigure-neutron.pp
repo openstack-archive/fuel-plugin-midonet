@@ -29,9 +29,9 @@ ensure_resource('file', '/etc/neutron/plugins/midonet', {
 
 neutron_plugin_midonet {
   'MIDONET/midonet_uri':  value => "http://${address}:8081/midonet-api";
-  'MIDONET/username':     value => 'admin';
-  'MIDONET/password':     value => 'admin';
-  'MIDONET/project_id':   value => 'admin';
+  'MIDONET/username':     value => $fuel_settings['access']['user'];
+  'MIDONET/password':     value => $fuel_settings['access']['password'];
+  'MIDONET/project_id':   value => $fuel_settings['access']['tenant'];
 } ->
 
 package {'python-neutron-plugin-midonet':

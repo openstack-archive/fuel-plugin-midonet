@@ -81,7 +81,7 @@ if member($roles, 'primary-controller') {
 
   neutron_router { 'router04':
     ensure               => present,
-    tenant_name          => 'admin',
+    tenant_name          => $nets['net04_ext']['tenant'],
     gateway_network_name => 'net04_ext',
   } ->
 

@@ -51,12 +51,14 @@ package {$openvswitch_package:
 
 class {'::midonet::midonet_agent':
   zk_servers      => $zoo_ips,
-  cassandra_seeds => values($cass_hash)
+  cassandra_seeds => values($cass_hash),
+  require         => Class['::midonet::repository']
 } ->
 
 class {'::midonet::midonet_cli':
   api_endpoint => "http://${api_ip}:8081/midonet-api",
   username     => $username,
   password     => $password,
-  tenant_name  => $tenant_name
+  tenant_name  => $tenant_name,
+  require      => Class['::midonet::repository']
 }
