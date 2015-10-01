@@ -26,7 +26,7 @@
 - id: midonet_install_dependencies
   role: [primary-controller, controller, compute, nsdb, midonet-gw]
   stage: post_deployment/1003
-  required_for: [pre_deployment_end]
+  required_for: [post_deployment_end]
   type: shell
   parameters:
     cmd: ./install_dependencies.sh
