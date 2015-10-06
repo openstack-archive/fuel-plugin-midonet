@@ -10,7 +10,7 @@ MidoNet Networks
 
 MidoNet changes the behaviour of Neutron
 deployments and understanding what MidoNet plugin does (especially on Public
-Network Ranges) - this concept is essential to configure the plugin properly.
+Network Ranges) is essential to configure the Fuel plugin properly.
 
 MidoNet plugin is compatible with **Neutron + GRE** environment, so let's focus
 on the deployment with ML2 first, to introduce the differences that MidoNet
@@ -88,7 +88,7 @@ established and routes are exchanged (gateway has a quagga instance running on
 it), N/S traffic comes routed from the Public API network to one of the MidoNet
 Gateways. It does not matter which of them gets the packet, they work as if it
 were a single machine. MidoNet Gateway sends the inbound packet directly to the
-host that has the Virtual Machine that has to receive the traffic. 
+host that has the Virtual Machine that has to receive the traffic.
 
 Controller nodes get less overloaded, since they only need to answer user
 requests and they almost don't handle VM traffic (only the metadata requests at
@@ -111,6 +111,23 @@ Select Environment
    to finish the configuration.
 
 #. Once the environment is created, open the *Settings* tab of the Fuel Web UI.
+
+Install Midokura Enterprise MidoNet (Optional)
+----------------------------------------------
+
+#. Installing Midokura Enterprise MidoNet, you will be able to use some specific
+   features from MidoNet only available on the Enterprise version.
+
+#. Activate the option **Install Midokura Enterprise MidoNet**.
+
+   .. image:: images/mem.png
+      :width: 100%
+
+#. Select the Midokura Enterprise MidoNet (MEM) version and fill the **Username** and
+   **Password** fields for downloading the packges from the repository.
+
+   .. image:: images/mem_credentials.png
+      :width: 100%
 
 Configure MidoNet Plugin
 ------------------------
@@ -164,6 +181,23 @@ Configure MidoNet Plugin
    - **BGP Peer X AS** and **BGP X IP Address**: Information needed to establish a
      BGP connection to remote peers.
 
+Install Midokura Enterprise MidoNet
+-----------------------------------
+
+#. Installing Midokura Enterprise MidoNet, you will be able to use some specific
+   features from MidoNet only available on the Enterprise version, like the MidoNet
+   Manager (GUI).
+
+#. Activate the option **Install Midokura Enterprise MidoNet**.
+
+   .. image:: images/mem.png
+      :width: 100%
+
+#. Select the Midokura Enterprise MidoNet (MEM) version and fill the **Username** and
+   **Password** fields for downloading the packges from the repository.
+
+   .. image:: images/mem_credentials.png
+      :width: 100%
 
 Assign Roles to Nodes
 ---------------------
