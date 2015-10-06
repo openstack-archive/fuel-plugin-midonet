@@ -3,6 +3,51 @@ attributes:
     restrictions:
       - condition: cluster:net_provider != 'neutron' or networking_parameters:segmentation_type != 'gre'
         action: hide
+  mem:
+    value: "disabled"
+    label: "Midokura Enterprise MidoNet (MEM)"
+    description: "If selected, Midokura Enterprise MidoNet (MEM) will be installed."
+    weight: 6
+    type: "checkbox"
+    values:
+      - data: "disabled"
+        label: "Midokura Enterprise MidoNet"
+
+  mem_version:
+    value: "v1.9"
+    label: "MEM release version"
+    description: "Choose the Midokura Enterprise MidoNet (MEM) release version"
+    type: "select"
+    weight: 7
+    values:
+      - data: "v1.9"
+        label: "v1.9"
+    restrictions:
+      - condition: "settings:midonet-fuel-plugin.mem.value == false"
+        strict: false
+        message: "Midokura Enterprise MidoNet (MEM) must be enabled"
+
+  mem_repo_user:
+    value: ''
+    label: "MEM repository username"
+    description: "Username for Midokura Enterprise MidoNet (MEM) repository"
+    type: "text"
+    weight: 8
+    restrictions:
+      - condition: "settings:midonet-fuel-plugin.mem.value == false"
+        strict: false
+        message: "Midokura Enterprise MidoNet (MEM) must be enabled"
+
+  mem_repo_password:
+    value: ''
+    label: "MEM repository password"
+    description: "Password for Midokura Enterprise MidoNet (MEM) repository"
+    type: "text"
+    weight: 9
+    restrictions:
+      - condition: "settings:midonet-fuel-plugin.mem.value == false"
+        strict: false
+        message: "Midokura Enterprise MidoNet (MEM) must be enabled"
 
   tunnel_type:
     type: "select"
@@ -16,7 +61,7 @@ attributes:
       - data: "vxlan"
         label: "VXLAN tunnels"
     restrictions:
-      - condition: settings:public_network_assignment.assign_to_all_nodes == false
+      - condition: "settings:public_network_assignment.assign_to_all_nodes == false"
         action: "hide"
 
   # Floating IP range #
