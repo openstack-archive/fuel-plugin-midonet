@@ -6,18 +6,55 @@ $m_version = 'v2015.06'
 $primary_controller_nodes = filter_nodes($all_nodes, 'role', 'primary-controller')
 $controllers = concat($primary_controller_nodes, filter_nodes($all_nodes, 'role', 'controller'))
 
-# MidoNet api manifest
+$midonet_settings = $fuel_settings['midonet-fuel-plugin']
+$mem = $midonet_settings['mem']
+$mem_version = $midonet_settings['mem_version']
+$mem_user = $midonet_settings['mem_repo_user']
+$mem_password = $midonet_settings['mem_repo_password']
 
-$mido_repo = $operatingsystem ? {
-  'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
-  'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+# MidoNet API manifest
+
+if $mem {
+  case $operatingsystem {
+    'CentOS': {
+      class { '::midonet::repository':
+        midonet_repo           => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/v${mem_version}/stable/RHEL",
+        manage_distro_repo     => false,
+        midonet_key_url        => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/RPM-GPG-KEY-midokura",
+        midonet_openstack_repo => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/openstack-juno/stable/RHEL",
+        midonet_stage          => "",
+        openstack_release      => 'juno'
+      }
+    }
+    'Ubuntu': {
+      class { '::midonet::repository':
+        midonet_repo           => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/v${mem_version}/stable",
+        manage_distro_repo     => false,
+        midonet_key_url        => "https://${mem_user}:${mem_password}@apt.midokura.com/packages.midokura.key",
+        midonet_openstack_repo => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/openstack-juno/stable",
+        midonet_stage          => "",
+        openstack_release      => 'juno'
+      }
+    }
+  }
+} else {
+  case $operatingsystem {
+    'CentOS': {
+      class { '::midonet::repository':
+        midonet_repo       => "http://repo.midonet.org/midonet/${m_version}/RHEL",
+        manage_distro_repo => false,
+        openstack_release  => 'juno'
+      }
+    }
+    'Ubuntu': {
+      class { '::midonet::repository':
+        midonet_repo       => "http://repo.midonet.org/midonet/${m_version}",
+        manage_distro_repo => false,
+        openstack_release  => 'juno'
+      }
+    }
+  }
 }
-
-class {'::midonet::repository':
-  midonet_repo       => $mido_repo,
-  manage_distro_repo => false,
-  openstack_release  => 'juno'
-} ->
 
 class {'::midonet::midonet_api':
   zk_servers           => $zoo_ips,

@@ -10,6 +10,12 @@ $username = $fuel_settings['access']['user']
 $password = $fuel_settings['access']['password']
 $tenant_name = $fuel_settings['access']['tenant']
 
+$midonet_settings = $fuel_settings['midonet-fuel-plugin']
+$mem = $midonet_settings['mem']
+$mem_version = $midonet_settings['mem_version']
+$mem_user = $midonet_settings['mem_repo_user']
+$mem_password = $midonet_settings['mem_repo_password']
+
 $ovsdb_service_name = $operatingsystem ? {
   'CentOS' => 'openvswitch',
   'Ubuntu' => 'openvswitch-switch'
@@ -25,16 +31,47 @@ $openvswitch_package = $operatingsystem ? {
   'Ubuntu' => 'openvswitch-switch'
 }
 
-$mido_repo = $operatingsystem ? {
-  'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
-  'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+if $mem {
+  case $operatingsystem {
+    'CentOS': {
+      class { '::midonet::repository':
+        midonet_repo           => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/v${mem_version}/stable/RHEL",
+        manage_distro_repo     => false,
+        midonet_key_url        => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/RPM-GPG-KEY-midokura",
+        midonet_openstack_repo => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/openstack-juno/stable/RHEL",
+        midonet_stage          => "",
+        openstack_release      => 'juno'
+      }
+    }
+    'Ubuntu': {
+      class { '::midonet::repository':
+        midonet_repo           => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/v${mem_version}/stable",
+        manage_distro_repo     => false,
+        midonet_key_url        => "https://${mem_user}:${mem_password}@apt.midokura.com/packages.midokura.key",
+        midonet_openstack_repo => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/openstack-juno/stable",
+        midonet_stage          => "",
+        openstack_release      => 'juno'
+      }
+    }
+  }
+} else {
+  case $operatingsystem {
+    'CentOS': {
+      class { '::midonet::repository':
+        midonet_repo       => "http://repo.midonet.org/midonet/${m_version}/RHEL",
+        manage_distro_repo => false,
+        openstack_release  => 'juno'
+      }
+    }
+    'Ubuntu': {
+      class { '::midonet::repository':
+        midonet_repo       => "http://repo.midonet.org/midonet/${m_version}",
+        manage_distro_repo => false,
+        openstack_release  => 'juno'
+      }
+    }
+  }
 }
-
-class {'::midonet::repository':
-  midonet_repo       => $mido_repo,
-  manage_distro_repo => false,
-  openstack_release  => 'juno'
-} ->
 
 service {$ovsdb_service_name:
   ensure => stopped,
