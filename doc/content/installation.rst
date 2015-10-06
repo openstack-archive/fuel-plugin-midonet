@@ -76,7 +76,7 @@ NSDB role
 
     name: nsdb
     meta:
-      name: Network State Database for Midonet
+      name: Network State Database for MidoNet
       description: MidoNet Synchronization Services
     volumes_roles_mapping:
       - allocate_size: min
