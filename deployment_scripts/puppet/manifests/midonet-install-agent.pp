@@ -10,6 +10,11 @@ $username = $fuel_settings['access']['user']
 $password = $fuel_settings['access']['password']
 $tenant_name = $fuel_settings['access']['tenant']
 
+$mem = $midonet_settings['mem']
+$mem_version = $midonet_settings['mem_version']
+$mem_user = $midonet_settings['mem_repo_user']
+$mem_password = $midonet_settings['mem_repo_password']
+
 $ovsdb_service_name = $operatingsystem ? {
   'CentOS' => 'openvswitch',
   'Ubuntu' => 'openvswitch-switch'
@@ -25,9 +30,16 @@ $openvswitch_package = $operatingsystem ? {
   'Ubuntu' => 'openvswitch-switch'
 }
 
-$mido_repo = $operatingsystem ? {
-  'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
-  'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+if $mem {
+  $mido_repo = $operatingsystem ? {
+    'CentOS' => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/${mem_version}/stable/RHEL",
+    'Ubuntu' => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable"
+  }
+} else {
+  $mido_repo = $operatingsystem ? {
+    'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
+    'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+  }
 }
 
 class {'::midonet::repository':

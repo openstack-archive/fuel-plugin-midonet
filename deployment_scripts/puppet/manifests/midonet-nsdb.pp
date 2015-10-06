@@ -19,9 +19,22 @@ $zoo_hash = generate_zookeeper_hash($nsdb_nodes)
 $cass_hash = nodes_to_hash($nsdb_nodes, 'name', 'internal_address')
 
 $m_version = 'v2015.06'
-$mido_repo = $operatingsystem ? {
-  'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
-  'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+
+$mem = $midonet_settings['mem']
+$mem_version = $midonet_settings['mem_version']
+$mem_user = $midonet_settings['mem_repo_user']
+$mem_password = $midonet_settings['mem_repo_password']
+
+if $mem {
+  $mido_repo = $operatingsystem ? {
+    'CentOS' => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/${mem_version}/stable/RHEL",
+    'Ubuntu' => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable"
+  }
+} else {
+  $mido_repo = $operatingsystem ? {
+    'CentOS' => "http://repo.midonet.org/midonet/${m_version}/RHEL",
+    'Ubuntu' => "http://repo.midonet.org/midonet/${m_version}"
+  }
 }
 
 class {'::midonet::repository':
