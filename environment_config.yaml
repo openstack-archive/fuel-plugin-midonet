@@ -56,23 +56,23 @@ attributes:
   # Floating IP range #
   floating_cidr:
     value: ''
-    label: 'Public Network CIDR'
-    description: 'CIDR of the Public Network. Will override the default settings'
+    label: 'Floating Network CIDR'
+    description: 'CIDR of the Floating Network. Will override the default settings'
     weight: 30
     type: "text"
     regex:
       source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/(3[012]|[12]?[0-9])$'
-      error: 'Public Network must be a CIDR'
+      error: 'Floating Network must be a CIDR'
 
   gateway:
     value: ''
-    label: 'Public Gateway IP'
-    description: 'Gateway of the Public Network. Will override the default settings'
+    label: 'Floating Network Gateway IP'
+    description: 'Gateway of the Floating Network. Will override the default settings'
     weight: 35
     type: "text"
     regex:
       source: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
-      error: 'Public Network gateway must be an IP address'
+      error: 'Floating Network gateway must be an IP address'
 
   floating_ip_range_start:
     value: ''
