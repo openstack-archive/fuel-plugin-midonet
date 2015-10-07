@@ -111,6 +111,16 @@
     puppet_modules: puppet/modules:/etc/puppet/modules
     timeout: 720
 
+# Install nova-rootwrap network filters
+- id: midonet_nova_network
+  role: [compute]
+  stage: post_deployment/6421
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-nova-network.pp
+    puppet_modules: puppet/modules:/etc/puppet/modules
+    timeout: 720
+
 # Register any host that runs MidoNet agent to the default tunnelzone
 - id: midonet_host_registry
   role: [primary-controller, controller, compute, midonet-gw]
