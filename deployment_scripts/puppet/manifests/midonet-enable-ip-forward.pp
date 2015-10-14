@@ -14,4 +14,9 @@
 
 sysctl::value { 'net.ipv4.ip_forward':
   value => '1'
+} ->
+
+exec { 'load-sysctl':
+  command => "/sbin/sysctl -p /etc/sysctl.conf",
+  refreshonly => true
 }
