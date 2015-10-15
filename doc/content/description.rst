@@ -25,7 +25,7 @@ Requirements
 Requirement             Version/Comment
 ======================= ===============
 Fuel                    6.1
-MidoNet plugin for Fuel 2.0.0
+MidoNet plugin for Fuel 2.1.1
 ======================= ===============
 
 Limitations
