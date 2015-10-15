@@ -4,14 +4,11 @@ attributes:
       - condition: cluster:net_provider != 'neutron' or networking_parameters:segmentation_type != 'gre'
         action: hide
   mem:
-    value: "disabled"
+    value: false
     label: "Midokura Enterprise MidoNet (MEM)"
     description: "If selected, Midokura Enterprise MidoNet (MEM) will be installed."
     weight: 6
     type: "checkbox"
-    values:
-      - data: "disabled"
-        label: "Midokura Enterprise MidoNet"
 
   mem_version:
     value: "v1.9"
