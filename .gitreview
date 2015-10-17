@@ -1,5 +1,5 @@
 [gerrit]
 host=review.openstack.org
 port=29418
-project=stackforge/fuel-plugin-midonet.git
+project=openstack/fuel-plugin-midonet.git
 defaultbranch=stable/2.1.0
