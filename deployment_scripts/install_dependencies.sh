@@ -74,16 +74,16 @@ fi
 gem install json --no-ri --no-rdoc --debug
 gem install faraday --no-ri --no-rdoc --debug
 
-puppet module install ripienaar-module_data --version==0.0.3 --force
-puppet module install puppetlabs-java --version==1.4.1 --ignore-dependencies --force
-puppet module install puppetlabs-apt --version==1.8.0 --ignore-dependencies --force
-puppet module install midonet-cassandra --version==1.0.4 --ignore-dependencies --force
-puppet module install richardc-datacat --version==0.6.2 --force
-puppet module install deric-zookeeper --version==0.3.9 --ignore-dependencies --force
-puppet module install puppetlabs-concat --version==1.2.4 --ignore-dependencies --force
-puppet module install nanliu-staging --version==1.0.4 --ignore-dependencies --force
-puppet module install puppetlabs-tomcat --version==1.3.2 --ignore-dependencies --force
-puppet module install midonet-midonet --version==2015.6.0 --ignore-dependencies --force
+puppet module install ripienaar-module_data --version=0.0.3 --force
+puppet module install puppetlabs-java --version=1.4.1 --ignore-dependencies --force
+puppet module install puppetlabs-apt --version=1.8.0 --ignore-dependencies --force
+puppet module install midonet-cassandra --version=1.0.4 --ignore-dependencies --force
+puppet module install richardc-datacat --version=0.6.2 --force
+puppet module install deric-zookeeper --version=0.3.9 --ignore-dependencies --force
+puppet module install puppetlabs-concat --version=1.2.4 --ignore-dependencies --force
+puppet module install nanliu-staging --version=1.0.4 --ignore-dependencies --force
+puppet module install puppetlabs-tomcat --version=1.3.2 --ignore-dependencies --force
+puppet module install midonet-midonet --version=2015.6.0 --ignore-dependencies --force
 
 if [[ ! -a /etc/puppet/modules/neutron/manifests/plugins/midonet.pp ]]; then
   # Apply the released patch of Neutron Puppet to allow midonet manifests
