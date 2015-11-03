@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Code-Review+2: Antoni Segura Puimedon <toni@midokura.com>
+Workflow+1: Antoni Segura Puimedon <toni@midokura.com>
+Submitted-by: Jenkins
+Submitted-at: Tue, 03 Nov 2015 14:11:41 +0000
+Reviewed-on: https://review.openstack.org/241210
+Project: openstack/fuel-plugin-midonet
+Branch: refs/heads/master
