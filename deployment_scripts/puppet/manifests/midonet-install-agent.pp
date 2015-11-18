@@ -60,22 +60,20 @@ if $mem {
         manage_distro_repo     => false,
         midonet_key_url        => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/RPM-GPG-KEY-midokura",
         midonet_openstack_repo => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/openstack-juno/stable/RHEL",
-        midonet_stage          => "",
+        midonet_stage          => '',
         openstack_release      => 'juno'
       }
     }
     'Ubuntu': {
-      apt::source { 'MEM':
-        location    => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable",
-        key_content => $key_content,
-        include_src => false,
+      apt::key { 'BC4E4E90DDA81C21396081CC67B38D3A054314CD':
+        key_content => $key_content
       } ->
 
       class { '::midonet::repository':
         midonet_repo           => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable",
         manage_distro_repo     => false,
         midonet_openstack_repo => "http://${mem_user}:${mem_password}@apt.midokura.com/openstack/juno/stable",
-        midonet_stage          => "",
+        midonet_stage          => 'trusty',
         openstack_release      => 'juno'
       }
     }
