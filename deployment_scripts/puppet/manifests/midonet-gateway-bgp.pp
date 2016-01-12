@@ -61,7 +61,7 @@ exec {"set up external bridge":
 
 file {"/etc/init/midonet-network.conf":
   ensure => present,
-  source => "/etc/fuel/plugins/midonet-fuel-plugin-2.0/puppet/files/startup.conf"
+  source => "/etc/fuel/plugins/midonet-fuel-plugin-2.2/puppet/files/startup.conf"
 } ->
 
 midonet_gateway { $::fqdn:
