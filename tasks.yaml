@@ -97,7 +97,7 @@
   parameters:
     puppet_manifest: puppet/manifests/midonet-install-api.pp
     puppet_modules: puppet/modules:/etc/puppet/modules/
-    timeout: 720
+    timeout: 1440
 
 # Install, configure and run MidoNet agent and remove any other
 # openvswitch package which is not the Kernel module
@@ -108,7 +108,7 @@
   parameters:
     puppet_manifest: puppet/manifests/midonet-install-agent.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 720
+    timeout: 1440
 
 # During deployment, openvswitch has created a datapath called `ovs-services`.
 # Stop MidoNet agent, and clean the datapath, and run MidoNet agent again
