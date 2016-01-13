@@ -1,17 +1,19 @@
-$fuel_settings = parseyaml($astute_settings_yaml)
-$access_hash = hiera('access', {})
-$keystone_admin_tenant = $access_hash[tenant]
-$neutron_settings = hiera('quantum_settings')
-$nets = $neutron_settings['predefined_networks']
+# Extract data from hiera
+$access_data           = hiera_hash('access')
+$keystone_admin_tenant = $access_data['tenant']
+$network_metadata      = hiera_hash('network_metadata')
+$node_roles            = $network_metadata['nodes'][$::hostname]['node_roles']
+$neutron_settings      = hiera('quantum_settings')
+$nets                  = $neutron_settings['predefined_networks']
+$segment_id            = $nets['net04']['L2']['segment_id']
+$vm_net_l3             = $nets['net04']['L3']
 
-$nodes_hash = hiera('nodes', {})
-$roles = node_roles($nodes_hash, hiera('uid'))
+# Plugin settings data
+$midonet_settings = hiera_hash('midonet-fuel-plugin')
+$tz_type          = $midonet_settings['tunnel_type']
+$range_start      = $midonet_settings['floating_ip_range_start']
+$range_end        = $midonet_settings['floating_ip_range_end']
 
-$segment_id = $nets['net04']['L2']['segment_id']
-$vm_net_l3 = $nets['net04']['L3']
-
-$midonet_settings = $::fuel_settings['midonet-fuel-plugin']
-$tz_type = $midonet_settings['tunnel_type']
 $vm_net = { shared => false,
             "L2" => { network_type => $tz_type,
                       router_ext => false,
@@ -22,15 +24,13 @@ $vm_net = { shared => false,
             tenant => 'admin'
           }
 
-$range_start = $midonet_settings['floating_ip_range_start']
-$range_end = $midonet_settings['floating_ip_range_end']
 $allocation_pools = "start=$range_start,end=$range_end"
 
 service { 'neutron-server':
   ensure => running,
 }
 
-if member($roles, 'primary-controller') {
+if member($node_roles, 'primary-controller') {
   exec {'refresh-dhcp-agent':
     command   => 'crm resource start p_neutron-dhcp-agent',
     path      => '/usr/bin:/usr/sbin',

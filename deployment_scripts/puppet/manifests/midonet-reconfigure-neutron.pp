@@ -1,63 +1,16 @@
-$fuel_settings = parseyaml($astute_settings_yaml)
-$address = hiera('management_vip')
-# amqp settings
-$controllers                    = hiera('controllers')
-$controller_internal_addresses  = nodes_to_hash($controllers,'name','internal_address')
-$controller_nodes               = ipsort(values($controller_internal_addresses))
-$internal_address = hiera('internal_address')
-if $internal_address in $controller_nodes {
-  # prefer local MQ broker if it exists on this node
-  $amqp_nodes = concat(['127.0.0.1'], fqdn_rotate(delete($controller_nodes, $internal_address)))
-} else {
-  $amqp_nodes = fqdn_rotate($controller_nodes)
-}
-
-$amqp_port = '5673'
-$amqp_hosts = inline_template("<%= @amqp_nodes.map {|x| x + ':' + @amqp_port}.join ',' %>")
-$rabbit_hash = hiera('rabbit_hash', {})
-$service_endpoint = hiera('management_vip')
+# Neutron data
+$amqp_port             = '5673'
+$rabbit_hash           = hiera('rabbit_hash', {})
+$service_endpoint      = hiera('management_vip')
 $neutron_config        = hiera('quantum_settings')
 $neutron_db_password   = $neutron_config['database']['passwd']
 $neutron_user_password = $neutron_config['keystone']['admin_password']
 
-ensure_resource('file', '/etc/neutron/plugins/midonet', {
-  ensure => directory,
-  owner  => 'root',
-  group  => 'neutron',
-  mode   => '0640'}
-)
-
-neutron_plugin_midonet {
-  'MIDONET/midonet_uri':  value => "http://${address}:8081/midonet-api";
-  'MIDONET/username':     value => $fuel_settings['access']['user'];
-  'MIDONET/password':     value => $fuel_settings['access']['password'];
-  'MIDONET/project_id':   value => $fuel_settings['access']['tenant'];
-} ->
-
-package {'python-neutron-plugin-midonet':
-  ensure => present
-}
-
-if $::osfamily == 'Debian' {
-    file_line { '/etc/default/neutron-server:NEUTRON_PLUGIN_CONFIG':
-      path    => '/etc/default/neutron-server',
-      match   => '^NEUTRON_PLUGIN_CONFIG=(.*)$',
-      line    => "NEUTRON_PLUGIN_CONFIG=/etc/neutron/plugins/midonet/midonet.ini",
-      notify  => Service['neutron-server'],
-  }
-}
-
-# In RH, this link is used to start Neutron process but in Debian, it's used only
-# to manage database synchronization.
-if defined(File['/etc/neutron/plugin.ini']) {
-  File <| path == '/etc/neutron/plugin.ini' |> { target => '/etc/neutron/plugins/midonet/midonet.ini' }
-}
-else {
-  file {'/etc/neutron/plugin.ini':
-    ensure  => link,
-    target  => '/etc/neutron/plugins/midonet/midonet.ini'
-  }
-}
+# Neutron plugin data
+$access_data      = hiera_hash('access')
+$username         = $access_data['user']
+$password         = $access_data['password']
+$tenant_name      = $access_data['tenant']
 
 class {'::neutron':
   verbose                 => false,
@@ -65,7 +18,7 @@ class {'::neutron':
   use_syslog              => false,
   log_facility            => 'LOG_USER',
   base_mac                => 'fa:16:3e:00:00:00',
-  core_plugin             => 'midonet.neutron.plugin.MidonetPluginV2',
+  core_plugin             => 'neutron.plugins.midonet.plugin.MidonetPluginV2',
   service_plugins         => [],
   allow_overlapping_ips   => true,
   mac_generation_retries  => 32,
@@ -74,11 +27,19 @@ class {'::neutron':
   report_interval         => 5,
   rabbit_user             => $rabbit_hash['user'],
   rabbit_host             => ['localhost'],
-  rabbit_hosts            => [$amqp_hosts],
+  rabbit_hosts            => split(hiera('amqp_hosts', ''), ','),
   rabbit_port             => '5672',
   rabbit_password         => $rabbit_hash['password'],
   kombu_reconnect_delay   => '5.0',
   network_device_mtu      => undef,
+}
+
+class {'::neutron::plugins::midonet':
+  midonet_api_ip    => $service_endpoint,
+  midonet_api_port  => '8081',
+  keystone_username => $username,
+  keystone_password => $password,
+  keystone_tenant   => $tenant_name
 }
 
 class { '::neutron::server':

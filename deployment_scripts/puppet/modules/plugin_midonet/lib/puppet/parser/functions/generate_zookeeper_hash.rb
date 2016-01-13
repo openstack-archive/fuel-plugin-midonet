@@ -19,12 +19,10 @@ module Puppet::Parser::Functions
   ) do |argv|
     nodes_hash = argv[0]
     result = {}
-    sorted_ctrls = nodes_hash
-    sorted_ctrls.sort! {|a,b| a['uid'].to_i <=> b['uid'].to_i}
-    sorted_ctrls.each do |ctrl|
-        result[ctrl['fqdn']] = { 'host' => ctrl['internal_address'],
-                                 'id' => (sorted_ctrls.index(ctrl)+1).to_s
-                               }
+    nodes_hash.each do |ctrl|
+        result[ctrl[1]['fqdn']] = { 'host' => ctrl[1]['network_roles']['management'],
+                                    'id' => (nodes_hash.keys().index(ctrl).to_i + 1).to_s
+                                  }
     end
     return result
   end

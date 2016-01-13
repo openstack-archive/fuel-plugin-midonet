@@ -34,9 +34,9 @@ if $mem {
         midonet_repo           => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/${mem_version}/stable/RHEL",
         manage_distro_repo     => false,
         midonet_key_url        => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/RPM-GPG-KEY-midokura",
-        midonet_openstack_repo => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/openstack-juno/stable/RHEL",
+        midonet_openstack_repo => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/openstack-kilo/stable/RHEL",
         midonet_stage          => '',
-        openstack_release      => 'juno'
+        openstack_release      => 'kilo'
       }
     }
     'Ubuntu': {
@@ -47,9 +47,9 @@ if $mem {
       class { '::midonet::repository':
         midonet_repo           => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable",
         manage_distro_repo     => false,
-        midonet_openstack_repo => "http://${mem_user}:${mem_password}@apt.midokura.com/openstack/juno/stable",
+        midonet_openstack_repo => "http://${mem_user}:${mem_password}@apt.midokura.com/openstack/kilo/stable",
         midonet_stage          => 'trusty',
-        openstack_release      => 'juno'
+        openstack_release      => 'kilo'
       }
     }
   }
@@ -59,15 +59,16 @@ if $mem {
       class { '::midonet::repository':
         midonet_repo       => "http://repo.midonet.org/midonet/${oss_version}/RHEL",
         manage_distro_repo => false,
-        openstack_release  => 'juno'
+        openstack_release  => 'kilo'
       }
     }
     'Ubuntu': {
       class { '::midonet::repository':
         midonet_repo       => "http://repo.midonet.org/midonet/${oss_version}",
         manage_distro_repo => false,
-        openstack_release  => 'juno'
+        openstack_release  => 'kilo'
       }
     }
   }
 }
+

@@ -1,10 +1,13 @@
-$fuel_settings = parseyaml($astute_settings_yaml)
-$api_ip = $::fuel_settings['management_vip']
+# Extract data from hiera
+$api_ip      = hiera('management_vip')
+$access_data = hiera_hash('access')
+$username    = $access_data['user']
+$password    = $access_data['password']
+$tenant_name = $access_data['tenant']
 
-$tz_type = $::fuel_settings['midonet-fuel-plugin']['tunnel_type']
-$username = $fuel_settings['access']['user']
-$password = $fuel_settings['access']['password']
-$tenant_name = $fuel_settings['access']['tenant']
+# Plugin settings data
+$midonet_settings = hiera_hash('midonet-fuel-plugin')
+$tz_type = $midonet_settings['tunnel_type']
 
 $service_path = $operatingsystem ? {
   'CentOS' => '/sbin',

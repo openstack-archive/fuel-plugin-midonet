@@ -152,7 +152,7 @@
     timeout: 720
 
 # Clean and run Neutron database. That may help if someday we need a MidoNet
-# specific database table (like in v2.0 we will need, the `tasks` one)
+# specific database table
 - id: midonet_recreate_neutron_db
   role: [primary-controller]
   stage: post_deployment/6435
