@@ -1,5 +1,6 @@
-$nodes_hash = hiera('nodes', {})
-$roles = node_roles($nodes_hash, hiera('uid'))
+# Extract hiera data
+$network_metadata = hiera_hash('network_metadata')
+$roles = $network_metadata['nodes']["$::hostname"]['node_roles']
 
 $ovs_agent_name = $operatingsystem ? {
   'CentOS' => 'neutron-openvswitch-agent',

@@ -1,17 +1,18 @@
-$fuel_settings = parseyaml($astute_settings_yaml)
 $management_address = hiera('management_vip')
-$username = $fuel_settings['access']['user']
-$password = $fuel_settings['access']['password']
-$tenant_name = $fuel_settings['access']['tenant']
-$midonet_settings = $fuel_settings['midonet-fuel-plugin']
-$gateway_nodes = filter_nodes($fuel_settings['nodes'], 'role', 'midonet-gw')
-$gateways_hash_ips = nodes_to_hash($gateway_nodes, 'name', 'public_address')
-$gw_ip = $gateways_hash_ips[$::hostname]
-$gateways_hash_mask = nodes_to_hash($gateway_nodes, 'name', 'public_netmask')
-$gw_mask = $gateways_hash_mask[$::hostname]
-$net_hash = public_network_hash($gw_ip, $gw_mask)
+$access_data      = hiera_hash('access')
+$username         = $access_data['user']
+$password         = $access_data['password']
+$tenant_name      = $access_data['tenant']
+
+$midonet_settings = hiera_hash('midonet-fuel-plugin')
 $f_net_cidr = split($midonet_settings['floating_cidr'], '/')
 $remote_peers = generate_remote_peers($midonet_settings)
+
+$nodes_hash = hiera('nodes')
+$node = filter_nodes($nodes_hash, 'fqdn', $::fqdn)
+$gw_ip = $node[0]['public_address']
+$gw_mask = $node[0]['public_netmask']
+$net_hash = public_network_hash($gw_ip, $gw_mask)
 
 notify {"peers":
    message => "floating neeet si $remote_peers"
@@ -61,7 +62,7 @@ exec {"set up external bridge":
 
 file {"/etc/init/midonet-network.conf":
   ensure => present,
-  source => "/etc/fuel/plugins/midonet-fuel-plugin-2.2/puppet/files/startup.conf"
+  source => "/etc/fuel/plugins/midonet-fuel-plugin-3.0/puppet/files/startup.conf"
 } ->
 
 midonet_gateway { $::fqdn:

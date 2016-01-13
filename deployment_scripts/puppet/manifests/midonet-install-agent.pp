@@ -1,13 +1,16 @@
-$fuel_settings = parseyaml($astute_settings_yaml)
-$all_nodes = $fuel_settings['nodes']
-$nsdb_nodes = filter_nodes($all_nodes, 'role', 'nsdb')
-$zoo_ips = generate_api_zookeeper_ips($nsdb_nodes)
-$cass_hash = nodes_to_hash($nsdb_nodes, 'name', 'internal_address')
-$api_ip = $::fuel_settings['management_vip']
-
-$username = $fuel_settings['access']['user']
-$password = $fuel_settings['access']['password']
-$tenant_name = $fuel_settings['access']['tenant']
+# Extract data from hiera
+$network_metadata = hiera_hash('network_metadata')
+$neutron_config   = hiera_hash('neutron_config')
+$segmentation_type = $neutron_config['L2']['segmentation_type']
+$nsdb_hash        = get_nodes_hash_by_roles($network_metadata, ['nsdb'])
+$nsdb_mgmt_ips    = get_node_to_ipaddr_map_by_network_role($nsdb_hash, 'management')
+$zoo_ips_hash     = generate_api_zookeeper_ips(values($nsdb_mgmt_ips))
+$cass_ips         = values($nsdb_mgmt_ips)
+$api_ip           = hiera('management_vip')
+$access_data      = hiera_hash('access')
+$username         = $access_data['user']
+$password         = $access_data['password']
+$tenant_name      = $access_data['tenant']
 
 $ovsdb_service_name = $operatingsystem ? {
   'CentOS' => 'openvswitch',
@@ -38,8 +41,8 @@ package {$openvswitch_package:
 } ->
 
 class {'::midonet::midonet_agent':
-  zk_servers      => $zoo_ips,
-  cassandra_seeds => values($cass_hash),
+  zk_servers      => $zoo_ips_hash,
+  cassandra_seeds => $cass_ips
 } ->
 
 class {'::midonet::midonet_cli':
@@ -48,3 +51,15 @@ class {'::midonet::midonet_cli':
   password     => $password,
   tenant_name  => $tenant_name,
 }
+
+# Firewall rule to allow the udp port used for vxlan tunnelling of overlay
+#  traffic from midolman hosts to other midolman hosts.
+
+if $segmentation_type =='tun' {
+  firewall {'6677 vxlan port':
+    port   => '6677',
+    proto  => 'udp',
+    action => 'accept',
+  }
+}
+

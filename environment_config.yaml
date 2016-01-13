@@ -1,7 +1,7 @@
 attributes:
   metadata:
     restrictions:
-      - condition: cluster:net_provider != 'neutron' or networking_parameters:segmentation_type != 'gre'
+      - condition: cluster:net_provider != 'neutron'
         action: hide
   mem:
     value: false

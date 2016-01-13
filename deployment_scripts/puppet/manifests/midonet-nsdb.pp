@@ -12,11 +12,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-$fuel_settings = parseyaml($astute_settings_yaml)
-$all_nodes = $fuel_settings['nodes']
-$nsdb_nodes = filter_nodes($all_nodes, 'role', 'nsdb')
-$zoo_hash = generate_zookeeper_hash($nsdb_nodes)
-$cass_hash = nodes_to_hash($nsdb_nodes, 'name', 'internal_address')
+# Extract data from hiera
+$fuel_settings    = parseyaml($astute_settings_yaml)
+$network_metadata = hiera_hash('network_metadata')
+$nsdb_map         = get_nodes_hash_by_roles($network_metadata, ['nsdb'])
+$zoo_hash         = generate_zookeeper_hash($nsdb_map)
+$nsdb_mgmt_map    = get_node_to_ipaddr_map_by_network_role($nsdb_map, 'management')
 
 class {'::zookeeper':
   servers   => values($zoo_hash),
@@ -25,8 +26,8 @@ class {'::zookeeper':
 }
 
 class {'::cassandra':
-  seeds        => values($cass_hash),
-  seed_address => $cass_hash["${::hostname}"],
+  seeds        => values($nsdb_mgmt_map),
+  seed_address => $nsdb_mgmt_map["${::hostname}"]
 }
 
 firewall {'500 zookeeper ports':
