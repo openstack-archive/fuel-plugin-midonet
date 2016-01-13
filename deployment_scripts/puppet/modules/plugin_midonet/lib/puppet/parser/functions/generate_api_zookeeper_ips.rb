@@ -20,7 +20,7 @@ module Puppet::Parser::Functions
     result = []
     nodes_hash = argv[0]
     nodes_hash.each do |zk_ip|
-      result.push({'ip' => zk_ip['internal_address']})
+      result.push({'ip' => zk_ip})
     end
     return result
   end

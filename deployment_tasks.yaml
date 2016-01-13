@@ -1,0 +1,17 @@
+- id: mido-nsdb
+  type: group
+  role: [nsdb]
+  requires: []
+  required_for: [pre_deployment_end]
+  parameters:
+    strategy:
+      type: parallel
+
+- id: midonet-gw
+  type: group
+  role: [midonet-gw]
+  requires: [deploy_start]
+  required_for: [deploy_end]
+  parameters:
+    strategy:
+      type: parallel

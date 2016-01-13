@@ -25,3 +25,4 @@ exec {'sleep 3':
 exec {'service midolman start':
   path   => $service_path
 }
+
