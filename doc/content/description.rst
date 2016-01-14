@@ -1,4 +1,4 @@
-MidoNet Plugin for Fuel 6.1
+MidoNet Plugin for Fuel 7.0
 ===========================
 
 MidoNet is an Apache licensed production grade network virtualization software
@@ -7,7 +7,7 @@ manifests to install all the components to deploy easily MidoNet with Fuel in a
 production environment.
 
 MidoNet version that will be deployed is v2015.06_ and this plugin currently is
-only compatible with version 6.1 of Mirantis OpenStack Fuel.
+only compatible with version 7.0 of Mirantis OpenStack Fuel.
 
 There are no prerequisites to use the MidoNet plugin: MidoNet is Open Source,
 and the plugin sets the repositories from where download and install MidoNet
@@ -24,8 +24,8 @@ Requirements
 ======================= ===============
 Requirement             Version/Comment
 ======================= ===============
-Fuel                    6.1
-MidoNet plugin for Fuel 2.0.0
+Fuel                    7.0
+MidoNet plugin for Fuel 3.0.0
 ======================= ===============
 
 Limitations
@@ -36,7 +36,7 @@ Limitations
   options. However, VXLAN can be configured on the plugin settings after
   the environment creation.
 
-* The plugin works with CentOS 6.X and Ubuntu 14.XX environments.
+* The plugin works with Ubuntu 14.XX environment.
 
 .. _v2015.06: https://github.com/midonet/midonet/tree/stable/v2015.06.2
 .. _(MEM): http://docs.midokura.com/docs/latest/manager-guide/content/index.html
