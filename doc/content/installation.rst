@@ -36,14 +36,14 @@ To install the MidoNet Fuel plugin:
 #. Copy the *rpm* file to the Fuel Master node:
    ::
 
-      [root@home ~]# scp midonet-1.0-2.0.0-1.noarch.rpm root@fuel-master:/tmp
+      [root@home ~]# scp midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm root@fuel-master:/tmp
 
 #. Log into Fuel Master node and install the plugin using the
-   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#using-fuel-cli>`_:
+   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
 
    ::
 
-      [root@fuel-master ~]# fuel plugins --install midonet-1.0-2.0.0-1.noarch.rpm
+      [root@fuel-master ~]# fuel plugins --install midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm
 
 #. Verify that the plugin is installed correctly:
    ::
@@ -51,7 +51,7 @@ To install the MidoNet Fuel plugin:
      [root@fuel-master ~]# fuel plugins
      id | name    | version | package_version
      ---|---------|---------|----------------
-     9  | midonet | 2.0.0   | 2.0.0
+     9  | midonet | 4.0.0   | 3.0.0
 
 
 Create the MidoNet roles
@@ -82,9 +82,9 @@ NSDB role
       - allocate_size: min
         id: os
 
-#. Name it, for instance, ``nsdb.yaml``. Push the role for both environments
-   (``Ubuntu 2014.2.2-6.1`` and ``Centos 2014.2.2-6.1``) using the
-   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#using-fuel-cli>`_:
+#. Name it, for instance, ``nsdb.yaml``. Push the role for the environment
+   (``Ubuntu 2015.1.0-7.0``) using the
+   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
 
    ::
 
@@ -108,9 +108,9 @@ Gateway role
      - allocate_size: min
        id: os
 
-#. Create the role for both environments
-   (`Ubuntu 2014.2.2-6.1` and  `Centos 2014.2.2-6.1`) using the
-   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#using-fuel-cli>`_
+#. Create the role for the environment
+   (`Ubuntu 2015.1.0-7.0`) using the
+   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_
 
     ::
 
@@ -126,7 +126,7 @@ Now, you'll need to create a group inside
 to put the
 tasks related to the recently created roles on the Fuel Deployment Graph.
 
-#. Create a group type for Fuel 6.1 in a YAML file called
+#. Create a group type for Fuel 7.0 in a YAML file called
    ``/tmp/midonet_groups.yaml`` with the following content::
 
 
@@ -194,7 +194,7 @@ tasks related to the recently created roles on the Fuel Deployment Graph.
      fuel rel --rel 2 --deployment-tasks --upload
 
 #. Though current Fuel Plugins Framework only allows to apply tasks on
-   *pre_deployment* and *post_deployment* stages for 6.1 Fuel release,
+   *pre_deployment* and *post_deployment* stages for 7.0 Fuel release,
    adding these groups and these tasks into the main graph will allow **NSDB**
    and **Gateway** associated tasks to:
 
@@ -206,7 +206,7 @@ tasks related to the recently created roles on the Fuel Deployment Graph.
    - Access to global variables.
 
    - Configure the IP addresses for
-     `each Fuel network type <https://docs.mirantis.com/openstack/fuel/fuel-6.1/reference-architecture.html#network-architecture>`_.
+     `each Fuel network type <https://docs.mirantis.com/openstack/fuel/fuel-7.0/reference-architecture.html#network-architecture>`_.
 
-.. _Experimental Features: https://docs.mirantis.com/openstack/fuel/fuel-6.1/operations.html#enable-experimental-features
+.. _Experimental Features: https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#enable-experimental-features
 .. _Fuel Plugins Catalog: https://www.mirantis.com/products/openstack-drivers-and-plugins/fuel-plugins/

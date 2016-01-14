@@ -19,8 +19,8 @@ plugin has.
 Without MidoNet plugin
 ``````````````````````
 
-Fuel 6.1 reference architecture has a schema with the `networks that deploys
-<https://docs.mirantis.com/openstack/fuel/fuel-6.1/reference-architecture.html#neutron-with-gre-segmentation-and-ovs>`_.
+Fuel 7.0 reference architecture has a schema with the `networks that deploys
+<https://docs.mirantis.com/openstack/fuel/fuel-7.0/reference-architecture.html#neutron-with-gre-segmentation-and-ovs>`_.
 
 ML2 networks:
 
@@ -107,7 +107,7 @@ Select Environment
 
 #. MidoNet plugin does not interact with the rest of the options, so choose
    whatever your deployment demands on them. Follow instructions from
-   `the official Mirantis OpenStack documentation <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#create-a-new-openstack-environment>`_
+   `the official Mirantis OpenStack documentation <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#create-a-new-openstack-environment>`_
    to finish the configuration.
 
 #. Once the environment is created, open the *Settings* tab of the Fuel Web UI.
@@ -199,6 +199,6 @@ Assign Roles to Nodes
 Finish environment configuration
 --------------------------------
 
-#. Run `network verification check <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#verify-networks>`_
+#. Run `network verification check <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#verify-networks>`_
 
-#. Press `Deploy button <https://docs.mirantis.com/openstack/fuel/fuel-6.1/user-guide.html#deploy-changes>`_ to once you are done with environment configuration.
+#. Press `Deploy button <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#deploy-changes>`_ to once you are done with environment configuration.

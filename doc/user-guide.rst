@@ -1,4 +1,4 @@
-Guide to the MidoNet Plugin for Fuel 6.1
+Guide to the MidoNet Plugin for Fuel 7.0
 ========================================
 
 This document will guide you through the steps of install, configure and use the
