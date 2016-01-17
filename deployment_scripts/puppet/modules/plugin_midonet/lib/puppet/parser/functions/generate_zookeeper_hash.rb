@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-
+#
 module Puppet::Parser::Functions
   newfunction(:generate_zookeeper_hash, :type => :rvalue, :doc => <<-EOS
     This function returns Zookeper configuration hash
@@ -19,10 +19,11 @@ module Puppet::Parser::Functions
   ) do |argv|
     nodes_hash = argv[0]
     result = {}
-    nodes_hash.each do |ctrl|
-        result[ctrl[1]['fqdn']] = { 'host' => ctrl[1]['network_roles']['management'],
-                                    'id' => (nodes_hash.keys().index(ctrl).to_i + 1).to_s
-                                  }
+    nodes_hash.each_with_index do |ctrl, index|
+      result[ctrl[1]['fqdn']] = {
+        'host' => ctrl[1]['network_roles']['management'],
+        'id'   => (index + 1).to_s,
+      }
     end
     return result
   end
