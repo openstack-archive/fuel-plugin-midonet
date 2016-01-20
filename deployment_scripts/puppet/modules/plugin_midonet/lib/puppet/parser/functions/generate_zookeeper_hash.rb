@@ -25,6 +25,12 @@ module Puppet::Parser::Functions
         'id'   => (index + 1).to_s,
       }
     end
+
+    result['servers'] = []
+    nodes_hash.each do |ctrl|
+      result['servers'] << ctrl[1]['network_roles']['management']
+    end
+
     return result
   end
 end

@@ -20,7 +20,7 @@ $zoo_hash         = generate_zookeeper_hash($nsdb_map)
 $nsdb_mgmt_map    = get_node_to_ipaddr_map_by_network_role($nsdb_map, 'management')
 
 class {'::zookeeper':
-  servers   => values($zoo_hash),
+  servers   => $zoo_hash['servers'],
   id        => $zoo_hash["${::fqdn}"]['id'],
   client_ip => $zoo_hash["${::fqdn}"]['host'],
 }
