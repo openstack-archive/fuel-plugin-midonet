@@ -1,20 +1,20 @@
 MidoNet Fuel Plugin User Guide
 ==============================
 
-Once the Fuel MidoNet plugin has been installed (following `Installation Guide`_), you can
-create *OpenStack* environments that use MidoNet SDN controller as a Neutron
-Backend.
+Once the Fuel MidoNet plugin has been installed (following
+`Installation Guide`_), you can create *OpenStack* environments that use
+MidoNet SDN controller as a Neutron backend.
 
 MidoNet Networks
 ----------------
 
-MidoNet changes the behaviour of Neutron
-deployments and understanding what MidoNet plugin does (especially on Public
-Network Ranges) is essential to configure the Fuel plugin properly.
+MidoNet changes the behaviour of Neutron deployments and understanding what
+MidoNet plugin does (especially on Public Network Ranges) is essential to
+configure the Fuel plugin properly.
 
-MidoNet plugin is compatible with **Neutron + GRE** environment, so let's focus
-on the deployment with ML2 first, to introduce the differences that MidoNet
-plugin has.
+MidoNet plugin is compatible with both **Neutron + GRE** and **Neutron + VxLAN**
+environment, so let's focus on the deployment with ML2 first, to introduce the
+differences that MidoNet plugin has.
 
 Without MidoNet plugin
 ``````````````````````

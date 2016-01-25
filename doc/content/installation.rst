@@ -36,14 +36,16 @@ To install the MidoNet Fuel plugin:
 #. Copy the *rpm* file to the Fuel Master node:
    ::
 
-      [root@home ~]# scp midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm root@fuel-master:/tmp
+      [root@home ~]# scp midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm \
+      root@fuel-master:/tmp
 
 #. Log into Fuel Master node and install the plugin using the
    `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
 
    ::
 
-      [root@fuel-master ~]# fuel plugins --install midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm
+      [root@fuel-master ~]# fuel plugins --install \
+      midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm
 
 #. Verify that the plugin is installed correctly:
    ::
@@ -51,7 +53,7 @@ To install the MidoNet Fuel plugin:
      [root@fuel-master ~]# fuel plugins
      id | name    | version | package_version
      ---|---------|---------|----------------
-     9  | midonet | 4.0.0   | 3.0.0
+     9  | midonet | 3.0.0   | 3.0.0
 
 
 Create the MidoNet roles
@@ -88,8 +90,14 @@ NSDB role
 
    ::
 
-     $ fuel role --create --rel 1 --file nsdb.yaml
-     $ fuel role --create --rel 2 --file nsdb.yaml
+    $ fuel release
+    ---|----------------------|-------------|------------------|-------------
+    2  | Kilo on Ubuntu 14.04 | available   | Ubuntu           | 2015.1.0-7.0
+    1  | Kilo on CentOS 6.5   | unavailable | CentOS           | 2015.1.0-7.0
+
+   ::
+
+    $ fuel role --create --release 2 --file nsdb.yaml
 
 
 Gateway role
@@ -108,14 +116,19 @@ Gateway role
      - allocate_size: min
        id: os
 
-#. Create the role for the environment
-   (`Ubuntu 2015.1.0-7.0`) using the
-   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_
+#. Create the role for the environment (``Ubuntu 2015.1.0-7.0``) using the
+   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
 
-    ::
+   ::
 
-      $ fuel role --create --rel 1 --file gateway.yaml
-      $ fuel role --create --rel 2 --file gateway.yaml
+    $ fuel release
+    ---|----------------------|-------------|------------------|-------------
+    2  | Kilo on Ubuntu 14.04 | available   | Ubuntu           | 2015.1.0-7.0
+    1  | Kilo on CentOS 6.5   | unavailable | CentOS           | 2015.1.0-7.0
+
+   ::
+
+    $ fuel role --create --release 2 --file nsdb.yaml
 
 
 Edit the Fuel deployment graph dependency cycle
@@ -164,34 +177,34 @@ tasks related to the recently created roles on the Fuel Deployment Graph.
       type: group
 
 
-#. Download the deployment tasks for the release 1:
+#. Download the deployment tasks for the **release 2** (``Ubuntu 2015.1.0-7.0``):
 
    ::
 
-      fuel rel --rel 1 --deployment-tasks --download
+    $ fuel release
+    ---|----------------------|-------------|------------------|-------------
+    2  | Kilo on Ubuntu 14.04 | available   | Ubuntu           | 2015.1.0-7.0
+    1  | Kilo on CentOS 6.5   | unavailable | CentOS           | 2015.1.0-7.0
 
-#. A file ``./release_1/deployment_tasks.yaml`` will be downloaded.
+   ::
+
+      fuel rel --rel 2 --deployment-tasks --download
+
+#. A file ``./release_2/deployment_tasks.yaml`` will be downloaded.
 
 #. Without moving from your current directory, append the
    ``/tmp/midonet_groups.yaml`` file into the ``deployment_tasks.yaml``:
 
    ::
 
-      cat /tmp/midonet_groups.yaml >> ./release_1/deployment_tasks.yaml
+      cat /tmp/midonet_groups.yaml >> ./release_2/deployment_tasks.yaml
 
-#. Upload the edited ``deployment-tasks`` file to the release 1:
-
-   ::
-
-     fuel rel --rel 1 --deployment-tasks --upload
-
-#. Do the same for **release 2**:
+#. Upload the edited ``deployment-tasks`` file to the ``release 2``:
 
    ::
 
-     fuel rel --rel 2 --deployment-tasks --download
-     cat /tmp/midonet_groups.yaml >> ./release_2/deployment_tasks.yaml
      fuel rel --rel 2 --deployment-tasks --upload
+
 
 #. Though current Fuel Plugins Framework only allows to apply tasks on
    *pre_deployment* and *post_deployment* stages for 7.0 Fuel release,
