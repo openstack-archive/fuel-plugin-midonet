@@ -19,5 +19,5 @@ licenses: ['Apache 2.0']
 authors: ['Lucas Eznarriaga <lucas@midokura.com>, Midokura',
           'Jaume Devesa <jaume@midokura.com>, Midokura',
           'Carmela Rubinos <carmela@midokura.com>, Midokura']
-homepage: 'https://github.com/stackforge/fuel-plugin-midonet'
+homepage: 'https://github.com/openstack/fuel-plugin-midonet'
 groups: ['network']
