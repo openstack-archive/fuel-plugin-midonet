@@ -1,8 +1,4 @@
 attributes:
-  metadata:
-    restrictions:
-      - condition: cluster:net_provider != 'neutron'
-        action: hide
   mem:
     value: false
     label: "Midokura Enterprise MidoNet (MEM)"

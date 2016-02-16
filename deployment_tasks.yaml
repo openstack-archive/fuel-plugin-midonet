@@ -1,8 +1,8 @@
-- id: mido-nsdb
+- id: midonet-nsdb
   type: group
-  role: [nsdb]
+  role: [midonet-nsdb]
   requires: []
-  required_for: [pre_deployment_end]
+  required_for: []
   parameters:
     strategy:
       type: parallel
@@ -10,8 +10,23 @@
 - id: midonet-gw
   type: group
   role: [midonet-gw]
-  requires: [deploy_start]
-  required_for: [deploy_end]
+  requires: []
+  required_for: []
   parameters:
     strategy:
       type: parallel
+
+- id: midonet_trick_l23network
+  type: puppet
+  role: [midonet-nsdb, midonet-gw, compute]
+  required_for: [pre_deployment_end]
+  requires: [pre_deployment_start]
+  version: 2.0.0
+  cross-depends:
+    - name: pre_deployment_start
+  cross-depended-by:
+    - name: pre_deployment_end
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-trick-l23network.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
