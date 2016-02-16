@@ -143,6 +143,21 @@ Configure MidoNet Plugin
    the plugin options that you are about to configure, making the Floating Network
    full-overlay and pure floating.
 
+#. Add a new custom repository in the *Repositories* tab in order to be able to
+   install `python-neutron-plugin-midonet` package:
+
+   - **Repository name**: in this field any name can be chosen, except
+     ‘midonet’, since this repo name is already used for the MEM repository.
+     It has been used ‘demo’ name for this example.
+
+   - **Repository URI**:
+     `deb http://repo.midonet.org/openstack-kilo-mirantis stable main`
+
+   - **Repository Priority**: 2000
+
+   .. image:: images/repository.png
+      :width: 100%
+
 #. Activate the option **Assign public networks to all nodes**.
    By default, Fuel only gives public access to Controllers. We need to enable
    this option in order to have external connectivity to Gateway Nodes.
