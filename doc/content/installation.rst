@@ -26,6 +26,11 @@ Enable Experimental Features
    $ cobbler sync
    $ exit
 
+#. Make sure the *nginx* and the *nailgun* docker services finished the restart
+process before go on with the new section::
+
+   $ dockerctl check
+
 
 Install the Plugin
 ------------------
@@ -113,8 +118,8 @@ Gateway role
       name: MidoNet HA Gateway
        description: MidoNet Gateway
       volumes_roles_mapping:
-     - allocate_size: min
-       id: os
+        - allocate_size: min
+          id: os
 
 #. Create the role for the environment (``Ubuntu 2015.1.0-7.0``) using the
    `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
@@ -128,7 +133,7 @@ Gateway role
 
    ::
 
-    $ fuel role --create --release 2 --file nsdb.yaml
+    $ fuel role --create --release 2 --file gateway.yaml
 
 
 Edit the Fuel deployment graph dependency cycle
