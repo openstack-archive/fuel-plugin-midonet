@@ -100,10 +100,14 @@ Now we are ready to create a Fuel environment that uses MidoNet.
 Select Environment
 ------------------
 
-#. When creating the environment in the Fuel UI wizard, choose Neutron with GRE on the Network tab.
+#. When creating the environment in the Fuel UI wizard, choose **Neutron with
+   tunneling segmentation** (second option) on the Network tab.
 
-   .. image:: images/gre_environment.png
+   .. image:: images/tunneling.png
       :width: 100%
+
+   After that, you will be able to choose between *GRE* or *VXLAN* segmentation.
+   MidoNet works with both.
 
 #. MidoNet plugin does not interact with the rest of the options, so choose
    whatever your deployment demands on them. Follow instructions from
