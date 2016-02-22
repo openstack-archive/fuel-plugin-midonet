@@ -27,7 +27,7 @@ Enable Experimental Features
    $ exit
 
 #. Make sure the *nginx* and the *nailgun* docker services finished the restart
-process before go on with the new section::
+   process before go on with the new section::
 
    $ dockerctl check
 
