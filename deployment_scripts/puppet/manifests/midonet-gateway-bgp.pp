@@ -13,6 +13,9 @@ $node = filter_nodes($nodes_hash, 'fqdn', $::fqdn)
 $gw_ip = $node[0]['public_address']
 $gw_mask = $node[0]['public_netmask']
 $net_hash = public_network_hash($gw_ip, $gw_mask)
+$bgp_subnet = split($midonet_settings['bgp_cidr'], '/')
+$bgp_subnet_ip = $bgp_subnet[0]
+$bgp_subnet_cidr = $bgp_subnet[1]
 
 notify {"peers":
    message => "floating neeet si $remote_peers"
@@ -73,7 +76,7 @@ midonet_gateway { $::fqdn:
   tenant_name     => $tenant_name,
   interface       => 'gw-veth-mn',
   local_as        => $midonet_settings['local_as'],
-  bgp_port        => { 'port_address' => $gw_ip, 'net_prefix' => $net_hash['network_address'], 'net_length' => $net_hash['mask']},
+  bgp_port        => { 'port_address' => $midonet_settings['bgp_ip'], 'net_prefix' => $bgp_subnet_ip, 'net_length' => $bgp_subnet_cidr },
   remote_peers    => $remote_peers,
   advertise_net   => [{ 'net_prefix' => $f_net_cidr[0], 'net_length' => $f_net_cidr[1]}]
 }

@@ -21,9 +21,6 @@ module Puppet::Parser::Functions
       if not mn_settings['remote_ip1'].empty? and not mn_settings['remote_as1'].empty?
           result.push({"as" => mn_settings['remote_as1'], "ip" => mn_settings['remote_ip1']})
       end
-      if not mn_settings['remote_ip2'].empty? and not mn_settings['remote_as2'].empty?
-          result.push({"as" => mn_settings['remote_as2'], "ip" => mn_settings['remote_ip2']})
-      end
       return result
   end
 end
