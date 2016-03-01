@@ -16,6 +16,7 @@ exec { 'grant_neutron_db':
 exec { 'neutron_db_sync':
   command => 'neutron-db-manage --config-file /etc/neutron/neutron.conf --config-file /etc/neutron/plugin.ini upgrade head',
   path    => '/usr/bin',
+  timeout => 500,
 }
 
 Exec['drop_neutron_db'] -> Exec['create_neutron_db'] -> Exec['grant_neutron_db'] -> Exec['neutron_db_sync']
