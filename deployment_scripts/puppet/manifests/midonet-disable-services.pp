@@ -37,6 +37,10 @@ if member($roles, 'primary-controller') {
   exec {'stop-l3-agent':
     command   => 'crm resource stop p_neutron-l3-agent',
     path      => '/usr/bin:/usr/sbin'
+  } ->
+  exec {'delete-l3-agent':
+    command   => 'crm configure delete p_neutron-l3-agent',
+    path      => '/usr/bin:/usr/sbin'
   }
 } else {
   service {$ovs_agent_name:
