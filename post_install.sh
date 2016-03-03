@@ -5,11 +5,13 @@
 
 #TODO: rollback all changes on package uninstall (uninstall.sh)
 
-YAML_CFG=/etc/fuel/7.0/version.yaml
+KEYSTONE_PASS=$(sed -n '/"FUEL_ACCESS"/,/^"/s/\(^[ ]*"password": "\)\(.*\)\("\)/\2/p')
+[ -z "$KEYSTONE_PASS" ] && KEYSTONE_PASS=$(sed -n '/FUEL_ACCESS/,/^[ ]/s/\(^[ ]*password: \)\(.*\)\(\)/\2/p')
+[ -z "$KEYSTONE_PASS" ] && KEYSTONE_PASS=admin
 export KEYSTONE_USER=admin
-export KEYSTONE_PASS=$(sed -n '/"FUEL_ACCESS"/,/"BOOTSTRAP"/s/\(^[ ]*"password": "\)\(.*\)\("\)/\2/p' /etc/fuel/astute.yaml)
-# Fuel 7.0 maintenance upgrade totally changed astute.yaml formatting!
-[ -z "$KEYSTONE_PASS" ] && KEYSTONE_PASS=$(sed -n '/FUEL_ACCESS/,/HOSTNAME/s/\(^[ ]*password: \)\(.*\)\(\)/\2/p' /etc/fuel/astute.yaml)
+export KEYSTONE_PASS
+FUEL_VER=$(fuel --version 2>&1 | tail -n1 | cut -c 1-3)
+YAML_CFG=/etc/fuel/$FUEL_VER/version.yaml
 
 # Enable Fuel experimental features
 if ! grep -q "\- experimental" $YAML_CFG; then
