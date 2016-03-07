@@ -114,6 +114,7 @@ Primary assignee:
 
 - Jaume Devesa <jaume@midokura.com> (developer)
 - Carmela Rubinos <carmela@midokura.com> (developer)
+- Samir Ibradzic <samir@midokura.com> (developer)
 
 Quality Assurance:
 - Lucas Eznarriaga <lucas@midokura.com>
