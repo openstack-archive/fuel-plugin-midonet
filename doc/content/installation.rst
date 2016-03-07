@@ -1,12 +1,44 @@
 
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+
 Installation Guide
 ==================
+
+Install the Plugin
+------------------
+
+To install the MidoNet Fuel plugin:
+
+#. Download MidoNet plugin v3.0.1 from `Fuel Plugins Catalog`_
+
+#. Log into Fuel Master node and install the plugin using the
+   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
+
+   ::
+
+    # fuel plugins --install midonet-fuel-plugin-3.0-3.0.1-1.noarch.rpm
+
+#. Verify that the plugin is installed correctly:
+   ::
+
+    # fuel plugins
+    id | name    | version | package_version
+    ---|---------|---------|----------------
+    9  | midonet | 3.0.1   | 3.0.0
+
 
 Enable Experimental Features
 ----------------------------
 
-#. To be able to install **MidoNet**, you should enable `Experimental Features`_.
-   To do so, manually modify the ``/etc/fuel/version.yaml`` file in *Fuel Master*
+To be able to use MidoNet Fuel plugin correctly, Fuel `Experimental Features`_
+must be enabled. This is done automatically by plugin post-install script,
+assuming the plugin is installed on top of clean Fuel master installation.
+In case the process has to be done manually, follow these steps:
+
+#. Modify the ``/etc/fuel/version.yaml`` file in *Fuel Master*
    host to add ``experimental`` to the ``feature_groups`` list in the ``VERSION``
    section, just below ``mirantis`` item:
 
@@ -20,59 +52,34 @@ Enable Experimental Features
 
 #. Restart the *Nailgun* container with dependencies by running::
 
-   $ dockerctl restart nailgun
-   $ dockerctl restart nginx
-   $ dockerctl shell cobbler
-   $ cobbler sync
-   $ exit
+   # dockerctl restart nailgun
+   # dockerctl restart nginx
+   # dockerctl shell cobbler
+   # cobbler sync
+   # exit
 
 #. Make sure the *nginx* and the *nailgun* docker services finished the restart
    process before go on with the new section::
 
-   $ dockerctl check
-
-
-Install the Plugin
-------------------
-
-To install the MidoNet Fuel plugin:
-
-#. Download it from the `Fuel Plugins Catalog`_
-#. Copy the *rpm* file to the Fuel Master node:
-   ::
-
-      [root@home ~]# scp midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm \
-      root@fuel-master:/tmp
-
-#. Log into Fuel Master node and install the plugin using the
-   `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
-
-   ::
-
-      [root@fuel-master ~]# fuel plugins --install \
-      midonet-fuel-plugin-3.0-3.0.0-1.noarch.rpm
-
-#. Verify that the plugin is installed correctly:
-   ::
-
-     [root@fuel-master ~]# fuel plugins
-     id | name    | version | package_version
-     ---|---------|---------|----------------
-     9  | midonet | 3.0.0   | 3.0.0
+   # dockerctl check
 
 
 Create the MidoNet roles
 ------------------------
 
-MidoNet needs two roles besides the ones provided with Fuel:
+MidoNet core functionality depends on two roles that are not provided by Fuel
+on default:
 
-- the **NSDB** role, which will install the Network State DataBase services
-  (ZooKeeper and Cassandra).
+- the **NSDB** role, which deploys the Network State DataBase services, namely
+  ZooKeeper and Cassandra.
 
-- the **Gateway** role, that will provide the HA Gateway machine for inbound and
-  outbound traffic of the *OpenStack* deployment. (See `User Guide
-  <./guide.rst>`_ for more info about networking in MidoNet)
+- the **Gateway** role, which provides the MidoNet gateway service needed for
+  handling external *OpenStack* traffic. (See `MidoNet Fuel Plugin User Guide`_ for
+  more info about networking in MidoNet)
 
+The above roles are added automatically by plugin post-install script,
+assuming the plugin is installed on top of clean Fuel master installation.
+In case the process has to be done manually, follow these steps:
 
 NSDB role
 `````````
@@ -139,14 +146,16 @@ Gateway role
 Edit the Fuel deployment graph dependency cycle
 -----------------------------------------------
 
-Now, you'll need to create a group inside
-`Fuel's Deployment Graph <https://docs.fuel-infra.org/fuel-dev/develop/modular-architecture.html#granular-deployment-process>`_
-to put the
-tasks related to the recently created roles on the Fuel Deployment Graph.
+The roles that were just added needs to be accompanied with appropriate
+deployment tasks, so that `Fuel's Deployment Graph
+<https://docs.fuel-infra.org/fuel-dev/develop/modular-architecture.html#granular-deployment-process>`_
+is fully populated. Again, needed deployment tasks are added automatically by
+plugin post-install script, assuming the plugin is installed on top of clean
+Fuel master installation. In case the process still has to be done manually,
+follow these steps:
 
 #. Create a group type for Fuel 7.0 in a YAML file called
    ``/tmp/midonet_groups.yaml`` with the following content::
-
 
     - id: nsdb
       parameters:
@@ -211,10 +220,10 @@ tasks related to the recently created roles on the Fuel Deployment Graph.
      fuel rel --rel 2 --deployment-tasks --upload
 
 
-#. Though current Fuel Plugins Framework only allows to apply tasks on
-   *pre_deployment* and *post_deployment* stages for 7.0 Fuel release,
-   adding these groups and these tasks into the main graph will allow **NSDB**
-   and **Gateway** associated tasks to:
+#. Current Fuel Plugins framework only allows to apply tasks on
+   *pre_deployment* and *post_deployment* stages, adding these groups
+   and tasks into the main graph will allow **NSDB** and **Gateway**
+   associated tasks to:
 
    - Configure *logging* to see Puppet and MCollective logs related to the tasks
      from the Fuel Web UI.
@@ -228,3 +237,4 @@ tasks related to the recently created roles on the Fuel Deployment Graph.
 
 .. _Experimental Features: https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#enable-experimental-features
 .. _Fuel Plugins Catalog: https://www.mirantis.com/products/openstack-drivers-and-plugins/fuel-plugins/
+

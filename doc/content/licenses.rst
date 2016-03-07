@@ -1,5 +1,11 @@
-Licenses
-========
+
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+
+Appendix B - licenses
+=====================
 
 Third Party Components Used in MidoNet OSS
 ------------------------------------------
@@ -24,15 +30,15 @@ Hibernate Validator http://hibernate.org/validator                      Apache 2
 HttpComponents      http://hc.apache.org                                Apache 2.0
 infinispan          http://infinispan.org/                              Apache 2.0
 Jackson             http://jackson.codehaus.org                         Apache 2.0
-Java                https://www.java.com                                Oracle’s Binary Code License Agreement
+Java                https://www.java.com                                Oracle Binary Code License Agreement
 Jcabi Aspects       http://aspects.jcabi.com/index.html                 BSD Three Clause
-Jetty               http://eclipse.org/jetty/                           Apache 2.0. May also be licensed under Eclipse 1.0
+Jetty               http://eclipse.org/jetty/                           Apache 2.0. and Eclipse 1.0
 jminix              https://code.google.com/p/jminix/                   Apache 2.0
 JMockit             http://jmockit.org                                  MIT
-jna                 https://github.com/twall/jna                        Apache 2.0 for versions 4.0 and later. Earlier versions used LGPL 2.1
+jna                 https://github.com/twall/jna                        LGPL 2.1. v4.0 and later: Apache 2.0.
 JsonPath            https://github.com/jayway/JsonPath                  Apache 2.0
 JSch                http://www.jcraft.com                               BSD-style
-LOGBack             http://logback.qos.ch                               EPL 1.0. Also available under LGPL 2.1
+LOGBack             http://logback.qos.ch                               EPL 1.0. and LGPL 2.1
 Metrics             https://dropwizard.github.io/metrics                Apache 2.0
 mockito             https://github.com/mockito/mockito                  MIT
 netty               http://netty.io                                     Apache 2.0
@@ -50,6 +56,7 @@ Scallop             https://github.com/scallop/scallop                  MIT
 slf4j               http://www.slf4j.org                                MIT
 =================== =================================================== ================
 
+
 Puppet Modules
 --------------
 
@@ -65,3 +72,4 @@ puppetlabs-apt         Apache 2.0
 puppetlabs-java        Apache 2.0
 puppetlabs-tomcat      Apache 2.0
 ====================== ==========
+

@@ -1,3 +1,9 @@
+
+.. raw:: pdf
+
+   PageBreak oneColumn
+
+
 MidoNet Fuel Plugin User Guide
 ==============================
 
@@ -8,93 +14,99 @@ MidoNet SDN controller as a Neutron backend.
 MidoNet Networks
 ----------------
 
-MidoNet changes the behaviour of Neutron deployments and understanding what
-MidoNet plugin does (especially on Public Network Ranges) is essential to
-configure the Fuel plugin properly.
+MidoNet changes the behaviour of dafault Neutron deployments, understanding
+what MidoNet plugin does, especially in regard to external networks, is
+essential to configure and use MidoNet Fuel plugin properly.
 
-MidoNet plugin is compatible with both **Neutron + GRE** and **Neutron + VxLAN**
-environment, so let's focus on the deployment with ML2 first, to introduce the
-differences that MidoNet plugin has.
+MidoNet plugin is compatible with both **Neutron + GRE** and
+**Neutron + VxLAN** network tunneling overlays, so let's focus on showing
+the differences betewwn the Neutron dafault ML2 deployments first.
 
-Without MidoNet plugin
-``````````````````````
+Neutron without MidoNet plugin
+``````````````````````````````
 
-Fuel 7.0 reference architecture has a schema with the `networks that deploys
-<https://docs.mirantis.com/openstack/fuel/fuel-7.0/reference-architecture.html#neutron-with-gre-segmentation-and-ovs>`_.
-
-ML2 networks:
+Fuel 7.0 reference architecture contains some useful informaition in
+`Neutron Network Topologies
+<https://docs.mirantis.com/openstack/fuel/fuel-7.0/reference-architecture.html#neutron-with-gre-segmentation-and-ovs>`_
+section. First, let's have an overview of Neutron-default ML2 topolgy:
 
 .. image:: images/fuelml2gre.png
    :width: 100%
 
-In this schema, red network represents the Public + Floating IP range. That
-means API access to services and Virtual Machines' Floating IPs share the same
-L2/L3 network. This schema overloads the Controllers' traffic, since Neutron L3
-service is running on the controller, answers ARP requests coming from inbound
-traffic that belong to Virtual Machines' Floating IPs, NATs the Floating IP to
-the private IP address of the Virtual Machine and puts the packet in the overlay
-of the green network (br-tun).
+In this topology, red, or "North" network represents the Public Internet,
+including Floating IP subnet assigned to OpenStack cloud. That means API access
+to services and Virtual Machines' Floating IPs share the same L2/L3 network.
+This topology overloads the Controllers' traffic, since Neutron L3 agent
+service is running on the controller, answers all ARP requests coming from
+"North" traffic that belong to Virtual Machines' Floating IPs, does NAT on all
+of the traffic destined to Floating IP assigned to Virtual Machines and places
+the resulting packets in the overlay of the green, "South" network (br-tun).
 
-Even in an HA deployment, the L3 agent only runs in one of the Controller, and
-only gets spawned in another host if the previous one loses connectivity (log
-into a controller and see how Pacemaker is configured).
+Even in an HA deployment, the L3 agent only runs on one of the Controllers, and
+only gets spawned in another host if the previous one loses connectivity
+(active-standby Corosync / Pacemaker HA setup).
 
-So Controller has to:
+Node hosting Neutron Controller has to:
 
 - Serve the API requests coming from users
-- Run the data and messaging services (rabbitmq and mysql is running on the
+- Run the data and RPC messaging services (Rabbitmq and MySQL is running on the
   controllers as well)
-- Handle all the N/S traffic that comes to and from the Virtual Machines.
+- Handle all the North-South traffic that comes to and from the Virtual Machines.
 
-With MidoNet plugin, separate the control traffic from the data one is easier.
 
-With MidoNet plugin
-```````````````````
+Neutron with MidoNet plugin
+```````````````````````````
 
-In MidoNet, even the Floating IPs live in the overlay. Floating Range is
+With MidoNet, Neutron separates the control traffic from the data traffic. 
+Even the Floating IPs live in the network overlay. Floating IP subnet is
 separated from the services API network range (called Public Network on Fuel
 and represented by the red network below) and MidoNet gateway advertises the
 routes that belong to Floating Ranges to BGP peers. So MidoNet plugin forces
 you to define a new Network on its settings, and allocation-range from
 environment settings get overridden.
 
-MidoNet deployment schema:
+MidoNet deployment topology:
 
 .. image:: images/midonet_fuel.png
    :width: 100%
 
-On this schema:
+On this topology diagram:
 
-- **Public API network** is the red one. Only *Controllers* and *Gateway* need
-  to access to it. It should be a BGP router listening on the network to learn the
-  Floating Range of the Virtual Machines.
+- **External Public & API networks** is the red one on the diagram. Only
+  *Controllers* (access to OpenStack APIs and Horizon) and *Gateway* need
+  access to this network. On the external side of this underlay we expect
+  an ISP BGP router(s), ready to learn our OpenStack Floating IP subnet
+  route so it can pass traffic to our virtual machines.
 
-- **Private network** is the green one. All the traffic between virtual
-  machines is tunneled by MidoNet over this network. Even Floating IP addresses.
+- **Private network** underlay is the green one on the diagram. All the traffic
+  between virtual machines is tunneled by MidoNet on top of this network.
+  Including traffic to and form floating IP addresses.
 
-- **Management network** is the blue one. All the nodes need to be connected to
-  it, this network is used by *NSDB* nodes to get information about Virtual
-  Network infrastructure and Virtual Machines' network flows.
+- **Management network** is the blue one. All nodes need to be connected to
+  it, this network is used for access to *NSDB* nodes in order to access 
+  virtual networks topology and flow information.
 
-- **PXE/Admin network** is the grey one. Needed by Fuel master to orchestrate
+- **PXE/Admin network** is the gray one. Needed by Fuel master to orchestrate
   the deployment.
 
-- **Storage network** is not represented, since MidoNet nodes are not involved
-  on it.
+- **Storage network** is not shown on the diagram, as it is out of scope of
+  this guide (and NEutron & MidoNet itself).
 
-MidoNet gateway is pure-distributed and you can put as many gateways as you
-want, so you don't overload machines in N/S traffic. Once BGP sessions are
-established and routes are exchanged (gateway has a quagga instance running on
-it), N/S traffic comes routed from the Public API network to one of the MidoNet
-Gateways. It does not matter which of them gets the packet, they work as if it
-were a single machine. MidoNet Gateway sends the inbound packet directly to the
-host that has the Virtual Machine that has to receive the traffic.
+MidoNet gateway is native distributed system, one can place as many gateways
+necessary, so North-South traffic can be distributed and balanced. Once BGP
+sessions are established and routes are exchanged between BGP "peers", 
+each North-to-South network packet gets routed from the External Public API
+network to one of the MidoNet gateways. It does not matter which of them gets
+the packet, they work as if they are a single entity. MidoNet gateway sends
+the inbound packet directly to the Compute that hosts the target virtual
+machine.
 
-Controller nodes get less overloaded, since they only need to answer user
-requests and they almost don't handle VM traffic (only the metadata requests at
-VM creation).
+In this way controller nodes gets significantly less overloaded, since they
+only need to answer user requests and they don't handle VM traffic at all
+(the only exception is the metadata traffic at VM provisioning time).
 
-Now we are ready to create a Fuel environment that uses MidoNet.
+Following the learned concepts, we are ready to create a Fuel environment
+that uses MidoNet.
 
 
 Select Environment
@@ -114,7 +126,15 @@ Select Environment
    `the official Mirantis OpenStack documentation <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#create-a-new-openstack-environment>`_
    to finish the configuration.
 
-#. Once the environment is created, open the *Settings* tab of the Fuel Web UI.
+Alternatively, this can be done in fuel cli:
+
+::
+
+   $ fuel env --create --name test-deployment --rel 2 --net neutron --nst tun
+
+
+Once the environment is created, open the *Settings* tab of the Fuel Web UI.
+
 
 Install Midokura Enterprise MidoNet (Optional)
 ----------------------------------------------
@@ -133,6 +153,7 @@ Install Midokura Enterprise MidoNet (Optional)
    .. image:: images/mem_credentials.png
       :width: 100%
 
+
 Configure MidoNet Plugin
 ------------------------
 
@@ -149,7 +170,7 @@ Configure MidoNet Plugin
 
 #. Activate the option **Assign public networks to all nodes**.
    By default, Fuel only gives public access to Controllers. We need to enable
-   this option in order to have external connectivity to Gateway Nodes.
+   this option in order to have external connectivity to Gateway nodes.
 
    .. image:: images/public_to_all.png
      :width: 100%
@@ -161,29 +182,42 @@ Configure MidoNet Plugin
 
    Let's explain them:
 
-   - **Tunnel Type**: Even you have chosen GRE tunnels on environment creation,
-     this is a convention because the deployment that Fuel does by default is the
-     closest to the MidoNet plugin one. Here you can choose between GRE or VXLAN as
-     tunneling technology.
+   - **Tunnel Type**: Here you can choose between GRE or VxLAN as
+     tunneling technology. Both are supported by MidoNet, but VxLAN is
+     recommended for its performance.
 
-   - **Public Network CIDR**: This option will be the CIDR of Neutron's External
-     Network. This range **MUST NOT** be the same as the *Public Network* section
-     of the *Settings* tab of the environment. There is no way to control this from
-     the plugin development, so this restriction is all up to you!
+   - **Floating Network subnet** Public Network CIDR**: This option represents
+     the CIDR of Neutron's external network (overriding Public Network CIDR for
+     the default Neutron ML2 plugin). This subnet **MUST NOT** be the same as
+     the *Public Network* CIDR section of the *Settings* tab of the
+     environment. Since there is no option to fine-tune this kind of network
+     separation control within Fuel core, one must use MidoNet Fuel plugin
+     settings to do it.
 
-   - **Public Gateway IP**: The IP address of the *Public Network CIDR*. It will be
-     the Gateway IP address of the MidoNet Virtual network. This IP address can not
-     be in the next section's range. . Recommendation: put the first IP address of
-     the CIDR. There is no way to control that this IP belongs to the CIDR in from
-     the plugin development, so be aware on the value you are setting.
+   - **Floating Network Gateway IP**: The Gateway IP address to the MidoNet
+     Virtual IP subnet. This IP address is usually set to the first available
+     IP in the subnet. Make sure that the address really belongs to the
+     *Floating Network subnet* CIDR.
 
-   - **Floating Range Start** and **Floating Range End**: First and last IP address
-     of the Floating range of IPs available to be used on Virtual Machines.
+   - **Floating Network Range Start** and **Floating Network Range End**:
+     First and last IP address of the Floating range of IPs available for use
+     on virtual machines.
 
-   - **Local AS** Your Autonomous System number to establish a BGP connection.
+   - **BGP routing subnet**: IP subnet in which BGP peers resides. Both local
+     and remote BGP peer IP addresses must belong to this subnet.
 
-   - **BGP Peer X AS** and **BGP X IP Address**: Information needed to establish a
-     BGP connection to remote peers.
+
+   - **BGP local IP address** and **BGP local AS**: This pair of parameters
+     identifies BGP peer local to MidoNet gateway. They are usually given by
+     ISP to be set into your networking equipment (in this case your MidoNet
+     gateway) by the network administrators. "AS number" stands for Autonomous
+     System Number.
+
+   - **BGP peer IP address** and **BGP peer AS**: This pair of parameters
+     usually identifies BGP peer on the side of your ISP. They are usually
+     given by ISP to be set into your BGP peer so that those peers know where
+     to find each other.
+
 
 Assign Roles to Nodes
 ---------------------
@@ -194,11 +228,13 @@ Assign Roles to Nodes
    .. image:: images/nodes_to_roles.png
       :width: 100%
 
-#. Just follow one rule:
+#. Some general advice to be followed:
 
-   - **DO NOT** assign the role **Gateway** and the role **Controller** altogether.
+   - **Gateway** role should be given to a dedicated node.
 
-   - **NSDB** role can be combined with any other role.
+   - **NSDB** role can be combined with any other roles, but note that it needs
+     at least 4GB RAM for itself (dedicated storage hihgly recommended).
+
 
 Finish environment configuration
 --------------------------------
@@ -206,3 +242,4 @@ Finish environment configuration
 #. Run `network verification check <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#verify-networks>`_
 
 #. Press `Deploy button <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#deploy-changes>`_ to once you are done with environment configuration.
+
