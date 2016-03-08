@@ -25,7 +25,7 @@ the differences betewwn the Neutron dafault ML2 deployments first.
 Neutron without MidoNet plugin
 ``````````````````````````````
 
-Fuel 7.0 reference architecture contains some useful informaition in
+Fuel |FuelVer| reference architecture contains some useful informaition in
 `Neutron Network Topologies
 <https://docs.mirantis.com/openstack/fuel/fuel-7.0/reference-architecture.html#neutron-with-gre-segmentation-and-ovs>`_
 section. First, let's have an overview of Neutron-default ML2 topolgy:
@@ -242,4 +242,50 @@ Finish environment configuration
 #. Run `network verification check <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#verify-networks>`_
 
 #. Press `Deploy button <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#deploy-changes>`_ to once you are done with environment configuration.
+
+
+Operations and Troubleshooting
+------------------------------
+
+A successful deployment done with MidoNet Fuel plugin will produce fully
+working OpenStack environment, with MidoNet Neutron network back-end.
+MidoNet is fully compatible with Neutron and Nova APIs and most of its
+aspects can be directly managed by OpenStack Horizon WEB interface, as well
+as Neutron API.
+
+Operating MidoNet
+`````````````````
+
+For advanced networking features supported by MidoNet please
+see `MidoNet Operations Guide`_. For general MidoNet troubleshooting, assuming
+the deployment went fine, please see `MidoNet Troubleshooting Guide`_.
+
+.. _MidoNet Operations Guide: https://docs.midonet.org/docs/v2015.06/en/operations-guide/content/index.html
+.. _MidoNet Troubleshooting Guide: https://docs.midonet.org/docs/v2015.06/en/troubleshooting-guide/content/index.html
+
+
+Troubleshooting MidoNet Fuel deployment
+```````````````````````````````````````
+
+In a case MidoNet Fuel deployment failed for some reason, first thing to
+do is to make sure that the initiated deployment satisfies the plugin
+`Limitations`_.
+
+In a case MidoNet Fuel deployment failed for some other reason, useful thing
+to be checked are various log outputs available in Fuel WEB UI. Click on the
+**Logs** tab and observe logging information. Default log displayed in the
+WEB interface shows "Web backend" logs, which are too general to provide
+any troubleshooting information, we want to check "Astute" logs, which can be
+selected by clicking *Source* drop down menu, followed by clicking **Show**
+button. In case of deployment errors, important messages will be shown in red,
+identifying which stage of deployment may have failed, and on which node(s).
+
+Next step is to look into how deployment tasks were executed at target nodes.
+After identifying nodes in previous step, select "Other servers" in the
+**Logs** drop-down menu, following by selecting an appropriate node in
+**Node** and "puppet" in **Source** drop-down menus. Again, important failures
+should be marked in red. Depending on user's level of understanding of these
+messages, they should either be included in MidoNet support claims to help
+to help the troubleshooting or an action can be taken by user to prevent issue
+from happening on re-deployment.
 

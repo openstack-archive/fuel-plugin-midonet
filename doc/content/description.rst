@@ -7,12 +7,12 @@ Introduction
 ============
 
 MidoNet is an Apache licensed production grade network virtualization software
-for Infrastructure-as-a-Service (IaaS) clouds. Plugin for Fuel 7.0 provides the
+for Infrastructure-as-a-Service (IaaS) clouds. Plugin for Fuel |FuelVer| provides the
 puppet manifests to install all the components to deploy easily MidoNet with
 Fuel in both lab or production environments.
 
 Fuel MidoNet plugin is capable of deploying MidoNet v2015.06_ on top of Mirantis
-OpenStack Fuel version 7.0 (including  Maintenance Update 2). There are no
+OpenStack Fuel version |FuelVer| (including  Maintenance Update 2). There are no
 prerequisites to use the MidoNet plugin: MidoNet is Open Source, and the plugin
 sets the repositories from where download and install MidoNet packages.
 
@@ -27,8 +27,8 @@ Requirements
 ======================= ===============
 Requirement             Version/Comment
 ======================= ===============
-Fuel                    7.0
-MidoNet plugin for Fuel 3.0.1
+Fuel                    |FuelVer|
+MidoNet plugin for Fuel |PluginVer|
 ======================= ===============
 
 Limitations
@@ -50,4 +50,22 @@ Limitations
 .. _v2015.06: https://github.com/midonet/midonet/tree/stable/v2015.06.2
 .. _MEM: http://docs.midokura.com/docs/latest/manager-guide/content/index.html
 .. _provided: http://www.midokura.com/mem-eval
+
+
+Changes in MidoNet plugin |PluginVer|
+-------------------------------------
+
+* New features:
+
+ * Support for Fuel 7.0 Maintenance Release 2
+ * Added post_install.sh script that sets up Fuel experimental features,
+   customized MidoNet roles and custom deployment graph
+
+* Bug fixes:
+
+ * Provided updated python-neutron-plugin-midonet debian package
+ * MidoNet BGP gateway role parameters
+ * Neutron db creation timeouts
+ * Fix some OSTF test scenarios
+ * Numerous documentation fixes
 

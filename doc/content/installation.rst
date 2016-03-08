@@ -12,7 +12,7 @@ Install the Plugin
 
 To install the MidoNet Fuel plugin:
 
-#. Download MidoNet plugin v3.0.1 from `Fuel Plugins Catalog`_
+#. Download MidoNet plugin version |PluginVer| from `Fuel Plugins Catalog`_
 
 #. Log into Fuel Master node and install the plugin using the
    `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
@@ -154,7 +154,7 @@ plugin post-install script, assuming the plugin is installed on top of clean
 Fuel master installation. In case the process still has to be done manually,
 follow these steps:
 
-#. Create a group type for Fuel 7.0 in a YAML file called
+#. Create a group type for Fuel |FuelVer| in a YAML file called
    ``/tmp/midonet_groups.yaml`` with the following content::
 
     - id: nsdb
