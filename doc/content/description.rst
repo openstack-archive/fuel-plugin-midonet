@@ -31,8 +31,8 @@ Fuel                    |FuelVer|
 MidoNet plugin for Fuel |PluginVer|
 ======================= ===============
 
-Limitations
------------
+Known Limitations
+-----------------
 
 * The plugin has some limitations regarding node count scalability for NSDB
   (Network State Database) and OpenStack Controller role nodes. Once number of
@@ -43,9 +43,6 @@ Limitations
 * Current version of plugin can only deploy single MidoNet Gareway role node.
   MidoNet itself supports any number of gateway nodes, it is only a plugin
   limitation, additional nodes needs to be set up manually. 
-
-* The plugin works with Mirantis OpenStack deployed on Ubuntu 14.04.x operating
-  system environment.
 
 .. _v2015.06: https://github.com/midonet/midonet/tree/stable/v2015.06.2
 .. _MEM: http://docs.midokura.com/docs/latest/manager-guide/content/index.html

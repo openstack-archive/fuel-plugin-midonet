@@ -9,7 +9,7 @@
 
 .. class:: center
 
-version |PluginVer| for Fuel |FuelVer|
+version 3.0-|PluginVer|-1 for Fuel |FuelVer|
 
 
 .. raw:: pdf
