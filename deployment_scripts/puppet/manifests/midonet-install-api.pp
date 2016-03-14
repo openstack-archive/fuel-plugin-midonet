@@ -60,6 +60,7 @@ exec { 'haproxy reload':
 Haproxy::Listen <||> -> Exec['haproxy reload']
 Haproxy::Balancermember <||> -> Exec['haproxy reload']
 
+class { 'firewall': }
 
 firewall {'502 Midonet api':
   port => '8081',

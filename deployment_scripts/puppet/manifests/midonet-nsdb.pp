@@ -30,6 +30,8 @@ class {'::cassandra':
   seed_address => $nsdb_mgmt_map["${::hostname}"]
 }
 
+class { 'firewall': }
+
 firewall {'500 zookeeper ports':
   port    => '2888-3888',
   proto   => 'tcp',

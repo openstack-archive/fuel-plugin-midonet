@@ -55,6 +55,8 @@ class {'::midonet::midonet_cli':
 # Firewall rule to allow the udp port used for vxlan tunnelling of overlay
 #  traffic from midolman hosts to other midolman hosts.
 
+class { 'firewall': }
+
 if $segmentation_type =='tun' {
   firewall {'6677 vxlan port':
     port   => '6677',
