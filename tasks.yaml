@@ -30,7 +30,7 @@
   type: shell
   parameters:
     cmd: ./install_dependencies.sh
-    timeout: 720
+    timeout: 1440
 
 - id: midonet_install_repositories
   role: [primary-controller, controller, compute, nsdb, midonet-gw]
@@ -63,7 +63,7 @@
   parameters:
     puppet_manifest: puppet/manifests/midonet-nsdb.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 720
+    timeout: 1440
 
 # Only running on primary controller: since we can only set tasks on
 # post-deployments, reaching this point means Neutron is deployed with
@@ -75,7 +75,7 @@
   type: shell
   parameters:
     cmd: ./clean_neutron.sh
-    timeout: 720
+    timeout: 1440
   fail_on_error: false
 
 # Disable all the Neutron services: neutorn-server, l3-agent, dhcp-agent
@@ -160,7 +160,7 @@
   parameters:
     puppet_manifest: puppet/manifests/midonet-recreate-neutron-db.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1440
 
 # Recreate the default networks on Neutron database and restart Neutron
 # services
@@ -181,4 +181,4 @@
   parameters:
     puppet_manifest: puppet/manifests/midonet-gateway-bgp.pp
     puppet_modules: puppet/modules:/etc/puppet/modules
-    timeout: 720
+    timeout: 1440
