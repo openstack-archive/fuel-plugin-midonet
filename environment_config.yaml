@@ -63,7 +63,7 @@ attributes:
 
   # Floating IP range #
   floating_cidr:
-    value: ''
+    value: '200.200.200.0/24'
     label: 'Floating Network subnet'
     description: 'CIDR of the Floating Network. Will override the default settings'
     weight: 20
@@ -73,7 +73,7 @@ attributes:
       error: 'Floating Network must be a CIDR'
 
   gateway:
-    value: ''
+    value: '200.200.200.1'
     label: 'Floating Network Gateway IP'
     description: 'Gateway of the Floating Network. Will override the default settings'
     weight: 21
@@ -83,7 +83,7 @@ attributes:
       error: 'Floating Network gateway must be an IP address'
 
   floating_ip_range_start:
-    value: ''
+    value: '200.200.200.100'
     label: 'Floating Network range start'
     description: 'First IP address of the Floating Network range. Will override the default settings'
     weight: 22
@@ -93,7 +93,7 @@ attributes:
       error: 'Floating Network range start value must be an IP address'
 
   floating_ip_range_end:
-    value: ''
+    value: '200.200.200.200'
     label: 'Floating Network range end'
     description: 'Last IP address of the Floating Network range. Will override the default settings'
     weight: 23
@@ -104,7 +104,7 @@ attributes:
 
   ## BGP Options ###
   bgp_cidr:
-    value: ''
+    value: '10.88.88.0/30'
     label: 'BGP routing subnet'
     description: 'CIDR of the BGP network'
     weight: 30
@@ -114,7 +114,7 @@ attributes:
       error: 'BGP Network must be a CIDR'
 
   bgp_ip:
-    value: ''
+    value: '10.88.88.2'
     label: 'BGP local IP address'
     description: 'IP address of the first Local BGP peer'
     weight: 31
@@ -124,7 +124,7 @@ attributes:
       error: 'Local BGP peer must be an IP address'
 
   local_as:
-    value: ''
+    value: '12345'
     label: 'BGP local AS'
     description: 'Autonomous System Number of the MidoNet Gateway'
     weight: 32
@@ -134,7 +134,7 @@ attributes:
       error: "BGP local AS must be an integer of 5 digits"
 
   remote_ip1:
-    value: ''
+    value: '10.88.88.1'
     label: 'BGP peer IP address'
     description: 'IP address of the BGP peer'
     weight: 33
@@ -144,7 +144,7 @@ attributes:
       error: 'Remote BGP peer must be an IP address'
 
   remote_as1:
-    value: ''
+    value: '63355'
     label: 'BGP peer AS'
     description: 'Autonomous System Number of the BGP peer'
     weight: 34
@@ -152,4 +152,3 @@ attributes:
     regex:
       source: '^([0-9]){5}$'
       error: "Remote AS must be an integer of 5 digits"
-
