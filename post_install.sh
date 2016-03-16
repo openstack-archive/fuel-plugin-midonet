@@ -68,6 +68,8 @@ if ! grep -q "\- id: nsdb" release_$REL/deployment_tasks.yaml; then
   - deploy_start
   required_for:
   - deploy_end
+  - primary-controller
+  - controller
   role:
   - nsdb
   type: group
@@ -76,6 +78,8 @@ if ! grep -q "\- id: nsdb" release_$REL/deployment_tasks.yaml; then
   - hiera
   - globals
   - netconfig
+  - connectivity_tests
+  - firewall
 THEEND
   fuel rel --rel $REL --deployment-tasks --upload 2> /dev/null
 fi

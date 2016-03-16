@@ -1,17 +1,85 @@
-- id: mido-nsdb
-  type: group
-  role: [nsdb]
-  requires: []
+#
+# Install the MidoNet dependencies
+#
+- id: install_puppet_midonet
+  role: [primary-controller, controller, compute, nsdb, midonet-gw]
   required_for: [pre_deployment_end]
+  requires: [rsync_core_puppet]
+  type: shell
   parameters:
-    strategy:
-      type: parallel
+    cmd: bash install_midonet_puppet_modules.sh
+    timeout: 1440
 
-- id: midonet-gw
-  type: group
-  role: [midonet-gw]
-  requires: [deploy_start]
+#
+# Setup midonet repo
+#
+- id: setup_repositories_midonet
+  groups: [primary-controller, controller, compute, nsdb, midonet-gw]
   required_for: [deploy_end]
+  requires: [netconfig]
+  type: puppet
   parameters:
-    strategy:
-      type: parallel
+    puppet_manifest: puppet/manifests/midonet-define-repositories.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+#
+# Zookeeper and Cassandra stage
+#
+- id: zookeeper_and_cassandra_midonet
+  groups: [nsdb]
+  required_for: [deploy_end]
+  requires: [setup_repositories_midonet, firewall]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-nsdb.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+
+# Make sure ip forward is set
+- id: enable_ip_forward_midonet
+  groups: [compute, controller, primary-controller, midonet-gw]
+  required_for: [deploy_end]
+  requires: [deploy_start]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-enable-ip-forward.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+
+# Deploy MidoNet API
+- id: deploy_api_midonet
+  groups: [primary-controller, controller]
+  required_for: [deploy_end]
+  requires: [enable_ip_forward_midonet, firewall]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-api.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+# Run midonet_agent
+- id: agent_midonet
+  groups: [primary-controller, controller, compute, midonet-gw]
+  required_for: [deploy_end, openstack-network-start]
+  requires: [enable_ip_forward_midonet, deploy_api_midonet]
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-agent.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+#
+# Neutron. Skip tasks
+#
+- id: openstack-network-plugins-l2
+  type: skipped
+- id: primary-openstack-network-plugins-l2
+  type: skipped
+- id: openstack-network-networks
+  type: skipped
+- id: openstack-network-agents-l3
+  type: skipped
+- id: primary-openstack-network-agents-l3
+  type: skipped
