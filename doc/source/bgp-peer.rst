@@ -1,8 +1,11 @@
+.. raw:: pdf
 
-Setting up test BGP peer
-========================
+   PageBreak oneColumn
 
-`BGP`_ is routing is an exterior gateway protocol supported and recommended to
+Appendix C - Setting up test BGP peer
+=====================================
+
+`BGP`_ routing is an exterior gateway protocol supported and recommended to
 MidoNet production use case. An external BGP peer is necessary for Floating IP
 (FIP) traffic between the deployed OpenStack cloud instances and the external
 network(s). These BGP peers are usually available for production or data-center
@@ -44,7 +47,6 @@ in this guide:
 - VyOS management IP on eth0 interface: **10.20.0.254/24**
 - Default gateway for management subnet: **10.20.0.1**
 
-|
 
 Also, BGP protocol itself needs some parameters to be set up. For our simple
 demonstration we assume that VyOS BGP peer that we are creating is going to
@@ -60,7 +62,6 @@ and IP addresses:
 - MidoNet BGP gateway IP address: **10.88.88.2**
 - MidoNet BGP gateway AS number: **12345**
 
-|
 
 Finally, to fulfill the purpose of this BGP setup, we need to know which
 Floating IP subnet is going to be handled by MidoNet-based OpenStack cloud,
@@ -68,7 +69,6 @@ so we specify subnet:
 
 - Floating IP subnet: **200.200.200.0/24**
 
-|
 
 
 VyOS Installation
@@ -339,4 +339,3 @@ in the management network gateway router, 10.20.0.1. For example:
 In case management gateway router is not accessible, the above
 static route can be set at each individual host that needs to access
 "fake" Floating IP network range.
-

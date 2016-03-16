@@ -1,4 +1,4 @@
-#    Copyright 2016 Midokura, SARL.
+#    Copyright 2015 Midokura SARL.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,13 +11,12 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-enable-ip.forward.pp')
+notice('MODULAR: midonet-replace-guess-func.pp')
 
-sysctl::value { 'net.ipv4.ip_forward':
-  value => '1'
-} ->
-
-exec { 'load-sysctl':
-  command => "/sbin/sysctl -p /etc/sysctl.conf",
-  refreshonly => true
+# NOTE: This replacement may be only needed on Ubuntu hosts
+file_line { 'replace_guess':
+   path     => '/usr/share/neutron-common/plugin_guess_func',
+   match    => '"neutron.plugins.midonet.plugin.MidonetPluginV2"',
+   line     => "\t\"midonet.neutron.plugin_v1.MidonetPluginV2\")",
+   multiple => true
 }
