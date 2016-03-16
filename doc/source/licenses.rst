@@ -4,7 +4,7 @@
    PageBreak oneColumn
 
 
-Appendix B - licenses
+Appendix A - licenses
 =====================
 
 Third Party Components Used in MidoNet OSS
@@ -63,13 +63,10 @@ Puppet Modules
 ====================== ==========
 Name                   License
 ====================== ==========
-midonet-midonet        Apache 2.0
 ripienaar-module_data  Apache 2.0
-puppetlabs-inifile     Apache 2.0
 deric-zookeeper        Apache 2.0
 midonet-cassandra      Apache 2.0
-puppetlabs-apt         Apache 2.0
 puppetlabs-java        Apache 2.0
 puppetlabs-tomcat      Apache 2.0
+midonet-midonet        Apache 2.0
 ====================== ==========
-

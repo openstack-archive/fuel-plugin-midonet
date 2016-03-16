@@ -17,10 +17,6 @@ $bgp_subnet = split($midonet_settings['bgp_cidr'], '/')
 $bgp_subnet_ip = $bgp_subnet[0]
 $bgp_subnet_cidr = $bgp_subnet[1]
 
-notify {"peers":
-   message => "floating neeet si $remote_peers"
-}
-
 exec {"set down external bridge":
  path    => "/usr/bin:/usr/sbin:/sbin",
   command => "ip link set dev br-ex down"
@@ -65,7 +61,7 @@ exec {"set up external bridge":
 
 file {"/etc/init/midonet-network.conf":
   ensure => present,
-  source => "/etc/fuel/plugins/midonet-fuel-plugin-3.0/puppet/files/startup.conf"
+  source => "/etc/fuel/plugins/midonet-fuel-plugin-4.0/puppet/files/startup.conf"
 } ->
 
 midonet_gateway { $::fqdn:

@@ -7,7 +7,8 @@ Compatible versions:
 - MidoNet v2015.6
 - Midokura Enterprise MidoNet 1.9
 
-How to build the plugin:
+How to build the plugin
+-----------------------
 
 - Install Fuel plugin builder (fpb)
 
@@ -23,13 +24,22 @@ How to build the plugin:
    $ cd fuel-plugin-midonet
    $ fpb --build .
 
-- Check if file midonet-fuel-plugin-3.0-3.0.1-1.noarch.rpm was created.
+A *rpm* called `midonet-fuel-plugin-4.0-4.0.0-1.noarch.rpm` should be created in
+the same directory.
 
-  ::
+Follow the documentation to install and configure the plugin. You can read the
+`rst` files in this very repository, or you can build a documentation file.
 
-   $ fuel plugins
-   id | name                | version | package_version
-   ---|---------------------|---------|----------------
-   1  | midonet-fuel-plugin | 3.0.1   | 3.0.0          
+How to build the documentation
+------------------------------
 
-Please refer to `Plugin Guide <./doc/user-guide.rst>`_ for documentation
+You need to have **Sphinx** installed in your computer. The Makefile provides
+several target formats to do so. Go to the `doc` directory and run:
+
+    make html
+
+or:
+
+    make pdf
+
+You will need `rst2pdf` to run the latter.
