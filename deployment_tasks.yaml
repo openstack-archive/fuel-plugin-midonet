@@ -1,17 +1,185 @@
-- id: mido-nsdb
-  type: group
-  role: [nsdb]
-  requires: []
-  required_for: [pre_deployment_end]
-  parameters:
-    strategy:
-      type: parallel
+#
+# DEPLOYMENT
+#
 
-- id: midonet-gw
-  type: group
-  role: [midonet-gw]
-  requires: [deploy_start]
-  required_for: [deploy_end]
+# First independent tasks
+- id: setup_repositories_midonet
+  groups:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  required_for:
+  - deploy_end
+  requires:
+  - netconfig
+  type: puppet
   parameters:
-    strategy:
-      type: parallel
+    puppet_manifest: puppet/manifests/midonet-define-repositories.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+- id: enable_ip_forward_midonet
+  groups:
+  - compute
+  - controller
+  - primary-controller
+  - midonet-gw
+  required_for:
+  - deploy_end
+  requires:
+  - deploy_start
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-enable-ip-forward.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+
+# NSDB-only tasks
+- id: zookeeper_and_cassandra_midonet
+  groups:
+  - nsdb
+  required_for:
+  - deploy_end
+  requires:
+  - setup_repositories_midonet
+  - firewall
+  type: puppet
+  reexecute_on:
+  - deploy_changes
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-nsdb.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+# PRE-NEUTRON CONFIGURATION
+- id: deploy_api_midonet
+  groups:
+  - primary-controller
+  - controller
+  required_for:
+  - deploy_end
+  - openstack-network-start
+  requires:
+  - setup_repositories_midonet
+  - enable_ip_forward_midonet
+  - firewall
+  type: puppet
+  reexecute_on:
+  - deploy_changes
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-api.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+# NEUTRON CONFIGURATION
+- id: openstack-network-midonet-replace-service-name
+  groups:
+  - primary-controller
+  - controller
+  requires:
+  - openstack-network-common-config
+  required_for:
+  - openstack-network-end
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-replace-guess-func.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+- id: openstack-network-midonet-config
+  groups:
+  - primary-controller
+  - controller
+  requires:
+  - openstack-network-midonet-replace-service-name
+  required_for:
+  - openstack-network-server-config
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-neutron-configure.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+- id: openstack-network-midonet-networks
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  required_for:
+  - openstack-network-end
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-neutron-networks.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+# Skipped tasks
+- id: openstack-network-server-config
+  type: skipped
+- id: openstack-network-networks
+  type: skipped
+- id: openstack-network-routers
+  type: skipped
+- id: openstack-network-plugins-l2
+  type: skipped
+- id: primary-openstack-network-plugins-l2
+  type: skipped
+- id: openstack-network-agents-l3
+  type: skipped
+- id: primary-openstack-network-agents-l3
+  type: skipped
+
+# POST-NEUTRON TASKS
+- id: agent-midonet
+  groups:
+  - primary-controller
+  - controller
+  - compute
+  - midonet-gw
+  required_for:
+  - deploy_end
+  requires:
+  - enable_ip_forward_midonet
+  - setup_repositories_midonet
+  - openstack-network-end
+  type: puppet
+  reexecute_on:
+  - deploy_changes
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-agent.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+- id: tunnel-zones-midonet
+  groups:
+  - compute
+  - controller
+  - primary-controller
+  - midonet-gw
+  required_for:
+  - deploy_end
+  requires:
+  - agent-midonet
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-host-registry.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+
+- id: rootwrap-midonet
+  groups:
+  - compute
+  - controller
+  - primary-controller
+  - midonet-gw
+  required_for:
+  - deploy_end
+  requires:
+  - agent-midonet
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-ensure-rootwrap.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
