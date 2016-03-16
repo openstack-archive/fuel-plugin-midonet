@@ -1,30 +1,29 @@
+.. |FuelVer|        replace:: 8.0
+.. |PrevPluginVer|  replace:: 3.0.1
+.. |PluginVer|      replace:: 4.0.0
 
-.. |FuelVer|        replace:: 7.0
-.. |PrevPluginVer|  replace:: 3.0.0
-.. |PluginVer|      replace:: 3.0.1
 
-=============================
- Guide to the MidoNet Plugin 
-=============================
+Document purpose
+================
 
-.. class:: center
-
-version 3.0-|PluginVer|-1 for Fuel |FuelVer|
-
+This document will guide you through the steps of install, configure and use the
+MidoNet plugin version |PluginVer| for Fuel |FuelVer|.
 
 .. raw:: pdf
 
    PageBreak oneColumn
 
+Contents
+========
 
-.. contents::
-.. section-numbering::
+.. toctree::
+   :maxdepth: 2
 
-
-.. raw:: pdf
-
-   PageBreak oneColumn
-
+   description
+   terms
+   installation
+   guide
+   appendixes
 
 Revision history
 ================
@@ -41,23 +40,13 @@ Revision history
    0.3      07.03.2016     Samir Ibradzic             Added release notes
                                                       and troubleshooting
                            (samir@midokura.com)
+   4.0      24.03.2016     Jaume Devesa               Adapt to Fuel 8
+
+                           (jaume@midokura.com)
 ========= =============== ========================== =========================
 
 .. raw:: pdf
 
    PageBreak oneColumn
 
-
-Document purpose
-================
-
-This document will guide you through the steps of install, configure and use the
-MidoNet plugin version |PluginVer| for Fuel |FuelVer|.
-
-.. include:: content/description.rst
-.. include:: content/terms.rst
-.. include:: content/installation.rst
-.. include:: content/guide.rst
-.. include:: content/licenses.rst
-.. include:: content/appendix.rst
 
