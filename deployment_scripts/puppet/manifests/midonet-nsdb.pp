@@ -11,6 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+notice('MODULAR: midonet-nsdb.pp')
 
 # Extract data from hiera
 $fuel_settings    = parseyaml($astute_settings_yaml)
