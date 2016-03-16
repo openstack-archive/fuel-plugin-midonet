@@ -1,4 +1,18 @@
-# Define the midonet repositories based on the settings file
+#    Copyright 2016 Midokura, SARL.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+notice('MODULAR: midonet-define-repositories.pp')
+
 $midonet_settings = hiera('midonet-fuel-plugin')
 $mem = $midonet_settings['mem']
 $mem_version = $midonet_settings['mem_version']
@@ -27,48 +41,41 @@ zg==
 =zF5K
 -----END PGP PUBLIC KEY BLOCK-----"
 
-if $mem {
-  case $operatingsystem {
-    'CentOS': {
-      class { '::midonet::repository':
-        midonet_repo           => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/${mem_version}/stable/RHEL",
-        manage_distro_repo     => false,
-        midonet_key_url        => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/RPM-GPG-KEY-midokura",
-        midonet_openstack_repo => "http://${mem_user}:${mem_password}@yum.midokura.com/repo/openstack-kilo/stable/RHEL",
-        midonet_stage          => '',
-        openstack_release      => 'kilo'
-      }
-    }
-    'Ubuntu': {
-      apt::key { 'BC4E4E90DDA81C21396081CC67B38D3A054314CD':
-        key_content => $key_content
-      } ->
+include apt
+include apt::update
 
-      class { '::midonet::repository':
-        midonet_repo           => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable",
-        manage_distro_repo     => false,
-        midonet_openstack_repo => "http://${mem_user}:${mem_password}@apt.midokura.com/openstack/kilo/stable",
-        midonet_stage          => 'trusty',
-        openstack_release      => 'kilo'
-      }
-    }
-  }
-} else {
-  case $operatingsystem {
-    'CentOS': {
-      class { '::midonet::repository':
-        midonet_repo       => "http://repo.midonet.org/midonet/${oss_version}/RHEL",
-        manage_distro_repo => false,
-        openstack_release  => 'kilo'
-      }
-    }
-    'Ubuntu': {
-      class { '::midonet::repository':
-        midonet_repo       => "http://repo.midonet.org/midonet/${oss_version}",
-        manage_distro_repo => false,
-        openstack_release  => 'kilo'
-      }
-    }
-  }
+# MidoNet Neutron plugin Liberty key
+apt::source {'midonet_neutron_liberty':
+  comment     => 'midonet plugin repository',
+  location    => 'http://builds.midonet.org/openstack-liberty',
+  release     => 'stable',
+  key         => '99143E75',
+  key_source  => 'https://builds.midonet.org/midorepo.key',
+  include_src => false
 }
 
+if $mem {
+  apt::key { 'BC4E4E90DDA81C21396081CC67B38D3A054314CD':
+    key_content => $key_content
+  } ->
+
+  # MEM 1.9 public key
+  apt::source {'midonet_oss':
+    comment     => 'midonet repository',
+    location    => "http://${mem_user}:${mem_password}@apt.midokura.com/midonet/${mem_version}/stable",
+    release     => 'trusty',
+    include_src => false
+  }
+
+} else {
+
+  # OSS 2015.06
+  apt::source {'midonet_oss':
+    comment     => 'midonet repository',
+    location    => 'http://repo.midonet.org/midonet/v2015.06',
+    release     => 'stable',
+    key         => '50F18FCF',
+    key_source  => 'http://repo.midonet.org/packages.midokura.key',
+    include_src => false
+  }
+}

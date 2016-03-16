@@ -1,0 +1,18 @@
+nsdb:
+  name: Network State Database for MidoNet
+  description: MidoNet Synchronization Services
+  has_primary: false
+  public_ip_required: false
+  weight: 100
+  limits:
+    min: 1
+    recommended: 3
+
+midonet-gw:
+  name: MidoNet HA Gateway
+  description: OpenStack node Gateway using MidoNet BGP
+  has_primary: false
+  public_ip_required: true
+  weight: 100
+  conflicts:
+    - controller

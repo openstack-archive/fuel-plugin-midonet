@@ -11,13 +11,20 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-enable-ip.forward.pp')
+notice('MODULAR: midonet-override-hiera.pp')
 
-sysctl::value { 'net.ipv4.ip_forward':
-  value => '1'
+$midonet_settings = hiera('midonet-fuel-plugin')
+$mem = $midonet_settings['mem']
+
+file {'/etc/hiera/plugins/midonet-fuel-plugin.yaml':
+    ensure => file,
+    source => '/etc/fuel/plugins/midonet-fuel-plugin-4.0/puppet/files/midonet-fuel-plugin.yaml'
 } ->
 
-exec { 'load-sysctl':
-  command => "/sbin/sysctl -p /etc/sysctl.conf",
-  refreshonly => true
+if $mem == false {
+    # MidoNet 2015.06 OSS does not support fernet tokens
+    file_line {
+        path => '/etc/hiera/plugins/midonet-fuel-plugin.yaml',
+        line => 'token_provider: uuid'
+    }
 }
