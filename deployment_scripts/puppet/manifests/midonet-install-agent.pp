@@ -1,3 +1,18 @@
+#    Copyright 2016 Midokura, SARL.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License"); you may
+#    not use this file except in compliance with the License. You may obtain
+#    a copy of the License at
+#
+#         http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+#    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+#    License for the specific language governing permissions and limitations
+#    under the License.
+notice('MODULAR: midonet-install-agent.pp')
+
 # Extract data from hiera
 $network_metadata = hiera_hash('network_metadata')
 $neutron_config   = hiera_hash('neutron_config')
@@ -33,11 +48,11 @@ service {$ovsdb_service_name:
 } ->
 
 package {$openvswitch_package_neutron:
-  ensure => absent
+  ensure => purged
 } ->
 
 package {$openvswitch_package:
-  ensure => absent
+  ensure => purged
 } ->
 
 class {'::midonet::midonet_agent':
@@ -65,3 +80,8 @@ if $segmentation_type =='tun' {
   }
 }
 
+exec {'/usr/bin/mm-dpctl --delete-dp ovs-system':
+  path    => "/usr/bin:/usr/sbin:/bin",
+  onlyif  => '/usr/bin/mm-dpctl --show-dp ovs-system',
+  require => Class['::midonet::midonet_agent']
+}
