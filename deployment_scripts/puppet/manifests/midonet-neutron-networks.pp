@@ -3,7 +3,7 @@ $access_data           = hiera_hash('access')
 $keystone_admin_tenant = $access_data['tenant']
 $network_metadata      = hiera_hash('network_metadata')
 $node_roles            = $network_metadata['nodes'][$::hostname]['node_roles']
-$neutron_settings      = hiera('quantum_settings')
+$neutron_settings      = hiera('neutron_config')
 $nets                  = $neutron_settings['predefined_networks']
 $segment_id            = $nets['net04']['L2']['segment_id']
 $vm_net_l3             = $nets['net04']['L3']
@@ -31,18 +31,6 @@ service { 'neutron-server':
 }
 
 if member($node_roles, 'primary-controller') {
-  exec {'refresh-dhcp-agent':
-    command   => 'crm resource start p_neutron-dhcp-agent',
-    path      => '/usr/bin:/usr/sbin',
-    tries     => 3,
-    try_sleep => 10,
-  } ->
-  exec {'refresh-metadata-agent':
-    command   => 'crm resource start p_neutron-metadata-agent',
-    path      => '/usr/bin:/usr/sbin',
-    tries     => 3,
-    try_sleep => 10,
-  } ->
 
   neutron_network { 'net04':
     ensure                    => present,

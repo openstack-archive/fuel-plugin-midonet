@@ -1,3 +1,4 @@
+notice('MODULAR: midonet-configure-neutron.pp')
 # Neutron data
 $amqp_port             = '5673'
 $rabbit_hash           = hiera('rabbit_hash', {})
@@ -12,13 +13,19 @@ $username         = $access_data['user']
 $password         = $access_data['password']
 $tenant_name      = $access_data['tenant']
 
+# Unfortunately, core_plugin in the 'openstack-network-common-config'
+# task is hardcoded. The core_plugin value for midonet is overrided
+# in hiera file, so running again class{'::neutron'} should modify
+# the core_plugin value in /etc/neutron/neutron.conf
+#
+# Hoping that Fuel will make the core plugin configurable and we
+# can remove this step
 class {'::neutron':
   verbose                 => false,
   debug                   => false,
   use_syslog              => false,
   log_facility            => 'LOG_USER',
   base_mac                => 'fa:16:3e:00:00:00',
-  core_plugin             => 'neutron.plugins.midonet.plugin.MidonetPluginV2',
   service_plugins         => [],
   allow_overlapping_ips   => true,
   mac_generation_retries  => 32,
@@ -34,6 +41,24 @@ class {'::neutron':
   network_device_mtu      => undef,
 }
 
+# NOTE: Don't comment these lines. Since we have changed the name
+# of the package, we are trying to get rid of this restriction:
+# https://github.com/openstack/puppet-neutron/blob/7.0.0/manifests/plugins/midonet.pp#L108
+package {'python-neutron-plugin-midonet':
+  ensure => absent
+}
+
+# The real plugin package
+package {'python-networking-midonet':
+  ensure => present
+}
+
+file {'/etc/default/neutron-server':
+  ensure => present,
+  owner  => 'root',
+  group  => 'root',
+  mode   => '0644'
+} ->
 class {'::neutron::plugins::midonet':
   midonet_api_ip    => $service_endpoint,
   midonet_api_port  => '8081',
@@ -60,12 +85,4 @@ class { '::neutron::server':
 
   api_workers => min($::processorcount + 0, 50 + 0),
   rpc_workers => 0,
-}
-
-class { '::neutron::agents::dhcp':
-  debug                    => false,
-  interface_driver         => 'neutron.agent.linux.interface.MidonetInterfaceDriver',
-  dhcp_driver              => 'midonet.neutron.agent.midonet_driver.DhcpNoOpDriver',
-  enable_isolated_metadata => true,
-  enabled                  => true,
 }
