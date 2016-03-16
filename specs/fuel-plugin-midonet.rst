@@ -10,7 +10,7 @@ MidoNet open source version that will be deployed is v2015.06.
 Midokura Enterprise Midonet (MEM) version that will be deployed is
 1.9.
 
-This plugin currently is only compatible with version 7.0 of Mirantis
+This plugin currently is only compatible with version 8.0 of Mirantis
 OpenStack Fuel.
 
 Problem description
@@ -41,14 +41,14 @@ What is new from the previous versions
 ======================================
 
 This plugin was originally developed for Fuel 6.1, and there are some
-important changes included in this plugin version for Fuel 7.0:
+important changes included in this plugin version for Fuel 8.0:
 
 - Regarding encapsulation methods, the plugin only supported GRE on
   previous versions. Now it supports both GRE and VxLAN.
 
 - Regarding OS support, the plugin supported both CentOS 6.5 and
   Ubuntu 14.04 on previous versions. Now it only supports Ubuntu
-  14.04, since Fuel 7.0 itself only supports this OS version.
+  14.04, since Fuel 8.0 itself only supports this OS version.
 
 Alternatives
 ------------
@@ -68,8 +68,8 @@ None.
 Upgrade impact
 --------------
 
-This plugin is only compatible with Fuel 7.0. If an upgrade is performed
-on the Fuel Master node to Fuel version higher than 7.0, it could stop
+This plugin is only compatible with Fuel 8.0. If an upgrade is performed
+on the Fuel Master node to Fuel version higher than 8.0, it could stop
 working.
 
 Security impact
@@ -125,7 +125,7 @@ Work Items
 Dependencies
 ============
 
-* Fuel 7.0
+* Fuel 8.0
 
 Testing
 =======
