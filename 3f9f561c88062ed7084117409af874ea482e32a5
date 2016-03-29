@@ -1,0 +1,8 @@
+Code-Review+2: Samir Ibradžić <sibradzic@gmail.com>
+Workflow+1: Samir Ibradžić <sibradzic@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 29 Mar 2016 09:48:46 +0000
+Reviewed-on: https://review.openstack.org/298536
+Project: openstack/fuel-plugin-midonet
+Branch: refs/heads/stable/3.0.1
