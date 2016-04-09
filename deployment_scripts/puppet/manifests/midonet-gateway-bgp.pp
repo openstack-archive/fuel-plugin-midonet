@@ -21,17 +21,6 @@ notify {"peers":
    message => "floating neeet si $remote_peers"
 }
 
-exec {"set down external bridge":
- path    => "/usr/bin:/usr/sbin:/sbin",
-  command => "ip link set dev br-ex down"
-} ->
-
-exec {"remove bridge ip address":
-  path    => "/usr/bin:/usr/sbin:/sbin",
-  command => "ip a del $::ipaddress_br_ex dev br-ex",
-  onlyif  => "ip -4 a | /bin/grep br-ex"
-} ->
-
 exec {"add veth interface":
   path    => "/usr/bin:/usr/sbin:/sbin",
   command => "ip link add gw-veth-br type veth peer name gw-veth-mn",
