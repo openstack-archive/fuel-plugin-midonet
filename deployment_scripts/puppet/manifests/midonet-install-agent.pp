@@ -42,11 +42,6 @@ $openvswitch_package = $operatingsystem ? {
   'Ubuntu' => 'openvswitch-switch'
 }
 
-service {$ovsdb_service_name:
-  ensure => stopped,
-  enable => false
-} ->
-
 package {$openvswitch_package_neutron:
   ensure => purged
 } ->
