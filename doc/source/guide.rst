@@ -8,7 +8,7 @@ MidoNet Fuel Plugin User Guide
 ==============================
 
 Once the Fuel MidoNet plugin has been installed (following
-`Installation Guide`_), you can create *OpenStack* environments that use
+:ref:`Installation Guide <installation_guide>`), you can create *OpenStack* environments that use
 MidoNet SDN controller as a Neutron back-end.
 
 MidoNet Networks
@@ -245,7 +245,7 @@ the deployment went fine, please see `MidoNet Troubleshooting Guide`_.
 
 .. _MidoNet Operations Guide: https://docs.midonet.org/docs/v2015.06/en/operations-guide/content/index.html
 .. _MidoNet Troubleshooting Guide: https://docs.midonet.org/docs/v2015.06/en/troubleshooting-guide/content/index.html
-.. _`Connectivity Check`: https://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#verify-networks
+.. _`Connectivity Check`: https://docs.mirantis.com/openstack/fuel/fuel-8.0/operations.html#network-issues
 
 
 
@@ -254,7 +254,7 @@ Troubleshooting MidoNet Fuel deployment
 
 In a case MidoNet Fuel deployment failed for some reason, first thing to
 do is to make sure that the initiated deployment satisfies the plugin
-`Known Limitations`_.
+:ref:`Known Limitations<known_limitations>`.
 
 In a case MidoNet Fuel deployment failed for some other reason, useful thing
 to be checked are various log outputs available in Fuel WEB UI. Click on the

@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'reno.sphinxext',
+#    'reno.sphinxext',
     'rst2pdf.pdfbuilder'
 ]
 
@@ -40,13 +40,14 @@ master_doc = 'index'
 project = u'fuel-midonet-plugin'
 copyright = u'2016, Midokura SARL'
 version = '4.0.0'
+release = version[:3] + '-' + version + '-1'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
-add_function_parentheses = True
+#add_function_parentheses = True
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-add_module_names = True
+#add_module_names = True
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -56,9 +57,8 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 # html_theme_path = ["."]
-# html_theme = '_theme'
-# html_static_path = ['static']
-# html_theme = 'default'
+html_theme = 'default'
+# html_static_path = ['_static']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = '%sdoc' % project
@@ -69,11 +69,14 @@ htmlhelp_basename = '%sdoc' % project
 latex_documents = [
     ('index',
      '%s.tex' % project,
-     u'%s Documentation' % project,
+     u'Guide to the MidoNet Plugin',
      u'OpenStack Foundation', 'manual'),
 ]
 
+latex_elements = { 'classoptions': ',openany,oneside', 'babel' : '\\usepackage[english]{babel}' }
+
 pdf_documents = [(master_doc, project, u'MidoNet plugin for Fuel 8', copyright),]
+pdf_inline_footnotes = True
 
 # Example configuration for intersphinx: refer to the Python standard library.
 #intersphinx_mapping = {'http://docs.python.org/': None}

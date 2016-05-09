@@ -3,6 +3,7 @@
 
    PageBreak oneColumn
 
+.. _installation_guide:
 
 Installation Guide
 ==================
@@ -26,7 +27,7 @@ To install the MidoNet Fuel plugin:
     # fuel plugins
     id | name    | version | package_version
     ---|---------|---------|----------------
-    9  | midonet | 4.0.1   | 4.0.0
+    9  | midonet | 4.0.0   | 4.0.0
 
 .. _`Fuel Plugin Catalog`: https://www.mirantis.com/products/openstack-drivers-and-plugins/fuel-plugins/
 .. _`Fuel CLI`: https://docs.mirantis.com/openstack/fuel/fuel-8.0/user-guide.html#using-fuel-cli
