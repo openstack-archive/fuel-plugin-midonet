@@ -114,8 +114,10 @@ Select Environment
    .. image:: ../images/tunneling.png
       :width: 75%
 
-   After that, you will be able to choose between *GRE* or *VXLAN* segmentation.
-   MidoNet works with both.
+   After that, one will be able to choose between *GRE* or *VXLAN* encapsulation
+   (WEB interface; Settings, Other section). MidoNet works with both of the
+   encapsulation technologies, but VXLAN may offer better performance,
+   especially for the deployments of a larger scale.
 
 #. MidoNet plugin does not interact with the rest of the options, so choose
    whatever your deployment demands on them. Follow instructions from the

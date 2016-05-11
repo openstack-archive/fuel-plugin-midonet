@@ -41,14 +41,14 @@ Known Limitations
 -----------------
 
 * The plugin has some limitations regarding node count scalability for NSDB
-  (Network State Database) and OpenStack Controller role nodes. Once number of
-  nodes with such roles have been determined on initial deployment, it can not
-  be changed. Compute role nodes are not affected by this limitation, current
-  plugin version supports Compute scalability.
+  (Network State Database) nodes. Once number of nodes with such role have been
+  determined on initial deployment, it can not be changed. Controller and
+  Compute role nodes are not affected by this limitation, current plugin
+  version supports Controller and Compute scalability.
 
 * Current version of plugin can only deploy single MidoNet Gareway role node.
   MidoNet itself supports any number of gateway nodes, it is only a plugin
-  limitation, additional nodes needs to be set up manually. 
+  limitation, additional gateways needs to be set up manually. 
 
 .. _v2015.06: https://github.com/midonet/midonet/releases/tag/v2015.06.3
 .. _MEM: http://docs.midokura.com/docs/latest/manager-guide/content/index.html
