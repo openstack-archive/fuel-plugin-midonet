@@ -3,8 +3,6 @@
 # Fuel 7.0 default deployment config hack script
 #
 
-#TODO: rollback all changes on package uninstall (uninstall.sh)
-
 KEYSTONE_PASS=$(sed -n '/"FUEL_ACCESS"/,/^"/s/\(^[ ]*"password": "\)\(.*\)\("\)/\2/p')
 [ -z "$KEYSTONE_PASS" ] && KEYSTONE_PASS=$(sed -n '/FUEL_ACCESS/,/^[ ]/s/\(^[ ]*password: \)\(.*\)\(\)/\2/p')
 [ -z "$KEYSTONE_PASS" ] && KEYSTONE_PASS=admin
