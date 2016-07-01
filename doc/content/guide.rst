@@ -289,3 +289,21 @@ messages, they should either be included in MidoNet support claims to help
 to help the troubleshooting or an action can be taken by user to prevent issue
 from happening on re-deployment.
 
+
+Note on Fuel upgrades
+`````````````````````
+
+Fuel provides special mechanism for upgrading locally hosted (usually on a Fuel
+master node itself) Operating System as well as OpenStack repositories. This is
+achieved with executing following commands on Fuel master node (assuming
+environment number 1 deployed on nodes 2, 3, 4, 5 and 6):
+
+   ::
+
+    # fuel-createmirror -M
+    # fuel --env 1 node --node-id 2 3 4 5 6 --tasks upload_core_repos
+
+For deployments based on MidoNet this will cause Neutron services to be restarted.
+This is an expected behavior, and it will not affect network functionality on VMs,
+virtual routers or gateways.
+

@@ -120,13 +120,13 @@ Gateway role
 
    ::
 
-      name: midonet-gw
-      meta:
+    name: midonet-gw
+    meta:
       name: MidoNet HA Gateway
-       description: MidoNet Gateway
-      volumes_roles_mapping:
-        - allocate_size: min
-          id: os
+      description: MidoNet Gateway
+    volumes_roles_mapping:
+    - allocate_size: min
+      id: os
 
 #. Create the role for the environment (``Ubuntu 2015.1.0-7.0``) using the
    `Fuel CLI <https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#using-fuel-cli>`_:
@@ -237,4 +237,33 @@ follow these steps:
 
 .. _Experimental Features: https://docs.mirantis.com/openstack/fuel/fuel-7.0/operations.html#enable-experimental-features
 .. _Fuel Plugin Catalog: https://www.mirantis.com/products/openstack-drivers-and-plugins/fuel-plugins/
+
+
+Verifying installation
+----------------------
+
+MidoNet MEM Fuel Plugin replaces Neutron default OpenvSwitch networking plugin in a
+typical OpenStack deployment based on Neutron. Therefore, the goal of the verifying
+the system that has just been deployed is to to ensure that plugin installation was
+successful as well to ensure that OpenStack Neutron networking supported by MidoNet
+is fully functional. Basic fuel OSTF health check provides a solid base for
+verifying basic OpenStack as well as MidoNet functionality, it is highly advised
+to make sure that this particular set of OSTF tests are passing correctly:
+
+#. Sanity tests: 
+
+   - Request list of networks
+
+#. Functional tests:
+
+   - Check network connectivity from instance via floating IP (requires functional BGP setup)
+   - Check network parameters
+   - Launch instance with file injection (requires functional BGP setup)
+
+|
+
+Although the list is somewhat short, executing these functional tests successfully will
+ensure that a larger set of MidoNet functionality is operating correctly. Just to mention
+few: MidoNet NSDB, MidoNet REST API, MidoNet Neutron plugin integration, MidoNet
+networking agents, MidoNet BGP gateway including Floating IPs.
 

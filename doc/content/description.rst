@@ -42,7 +42,7 @@ Known Limitations
 
 * Current version of plugin can only deploy single MidoNet Gareway role node.
   MidoNet itself supports any number of gateway nodes, it is only a plugin
-  limitation, additional nodes needs to be set up manually. 
+  limitation, additional nodes needs to be set up manually.
 
 .. _v2015.06: https://github.com/midonet/midonet/tree/stable/v2015.06.2
 .. _MEM: http://docs.midokura.com/docs/latest/manager-guide/content/index.html

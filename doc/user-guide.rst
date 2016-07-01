@@ -41,6 +41,11 @@ Revision history
    0.3      07.03.2016     Samir Ibradzic             Added release notes
                                                       and troubleshooting
                            (samir@midokura.com)
+   0.3a     29.06.2016     Samir Ibradzic             Formating fixes,
+                                                      added "Verifying
+                                                      installtion" and "Note
+                                                      on Fuel Upgrades" sections
+                           (samir@midokura.com)
 ========= =============== ========================== =========================
 
 .. raw:: pdf
