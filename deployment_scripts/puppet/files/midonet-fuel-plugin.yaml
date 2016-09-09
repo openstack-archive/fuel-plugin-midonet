@@ -1,3 +1,0 @@
-neutron::core_plugin: 'midonet.neutron.plugin_v1.MidonetPluginV2'
-neutron::agents::dhcp::interface_driver: 'neutron.agent.linux.interface.MidonetInterfaceDriver'
-neutron::agents::dhcp::dhcp_driver: 'midonet.neutron.agent.midonet_driver.DhcpNoOpDriver'

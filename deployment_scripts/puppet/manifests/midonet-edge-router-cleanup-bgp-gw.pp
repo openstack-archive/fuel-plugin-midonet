@@ -1,4 +1,4 @@
-#    Copyright 2015 Midokura SARL.
+#    Copyright 2016 Midokura, SARL.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,12 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-replace-guess-func.pp')
+notice('MODULAR: midonet-edge-router-cleanup-bgp-gw.pp')
 
-# NOTE: This replacement may be only needed on Ubuntu hosts
-file_line { 'replace_guess':
-  path     => '/usr/share/neutron-common/plugin_guess_func',
-  match    => '"neutron.plugins.midonet.plugin.MidonetPluginV2"',
-  line     => "\t\"midonet.neutron.plugin_v2.MidonetPluginV2\")",
-  multiple => true
-}
+
+  file {"/etc/init/midonet-network.conf":
+    ensure => absent,
+    source => "/etc/fuel/plugins/midonet-5.0/puppet/files/startup.conf"
+  }

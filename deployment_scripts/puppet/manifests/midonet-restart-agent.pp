@@ -1,4 +1,4 @@
-#    Copyright 2015 Midokura SARL.
+#    Copyright 2016 Midokura, SARL.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,12 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-replace-guess-func.pp')
+notice('MODULAR: midonet-restart-agent.pp')
 
-# NOTE: This replacement may be only needed on Ubuntu hosts
-file_line { 'replace_guess':
-  path     => '/usr/share/neutron-common/plugin_guess_func',
-  match    => '"neutron.plugins.midonet.plugin.MidonetPluginV2"',
-  line     => "\t\"midonet.neutron.plugin_v2.MidonetPluginV2\")",
-  multiple => true
-}
+exec { 'service midolman restart':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  } ->
+
+exec { 'sleep 4':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  } ->
+
+exec { 'service midonet-jmxscraper restart':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  }
