@@ -18,43 +18,130 @@
   - logging
   - hiera
   - globals
-  - netconfig-midonet
+  - netconfig
 
 - id: midonet-gw
   parameters:
     strategy:
       type: parallel
+  requires:
+  - deploy_start
+  - nsdb
   required_for:
   - deploy_end
-  requires:
-  - nsdb
   role:
   - midonet-gw
+  type: group
   tasks:
   - logging
   - hiera
   - globals
-  - netconfig-midonet
-  type: group
-
-#
-# DEPLOYMENT
-#
-
-- id: netconfig-midonet
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 3600
-    cwd: /
-  required_for:
   - netconfig
+
+- id: midonet-analytics
+  parameters:
+    strategy:
+      type: parallel
   requires:
-  - tools
-  groups:
-  - /.*/
-  type: puppet
+  - deploy_start
+  - nsdb
+  required_for:
+  - deploy_end
+  role:
+  - midonet-analytics
+  type: group
+  tasks:
+  - logging
+  - hiera
+  - globals
+  - netconfig
+
+# Override neutron params
+- id: install_common_deps
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: shell
+  requires: [pre_deployment_start]
+  required_for: [pre_deployment_end]
   version: 2.0.0
+  parameters:
+    cmd: bash install_midonet_common_modules_and_gems.sh
+    timeout: 1440
+
+- id: override_neutron_module
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: shell
+  requires: [pre_deployment_start]
+  required_for: [pre_deployment_end]
+  version: 2.0.0
+  parameters:
+    cmd: bash override_neutron_module.sh
+    timeout: 1440
+
+# Override neutron params
+- id: neutron-override
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: puppet
+  requires: [pre_deployment_start]
+  required_for: [pre_deployment_end]
+  version: 2.0.0
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-override-hiera.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+# Install the MidoNet Package. Everywhere
+- id: install_midonet_package
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: shell
+  requires: [deploy_start,setup_repositories]
+  required_for: [fuel_pkgs]
+  version: 2.0.0
+  parameters:
+    cmd: bash install_midonet_package_from_source.sh
+    timeout: 1440
+
+
+# Install the MidoNet_Openstack Package where needed. For Java, Zookeeper and Cassandra
+- id: install_midonet_openstack_package
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: shell
+  requires: [deploy_start,setup_repositories]
+  required_for: [fuel_pkgs]
+  version: 2.0.0
+  parameters:
+    cmd: bash install_midonet_openstack_package.sh
+    timeout: 1440
+
 
 # First independent tasks
 - id: setup_repositories_midonet
@@ -64,10 +151,16 @@
   - compute
   - nsdb
   - midonet-gw
+  - midonet-analytics
   required_for:
   - deploy_end
   requires:
   - netconfig
+  - install_common_deps
+  - install_midonet_package
+  - install_midonet_openstack_package
+  - override_neutron_module
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-define-repositories.pp
@@ -80,35 +173,21 @@
   - controller
   - primary-controller
   - midonet-gw
+  - midonet-analytics
   required_for:
   - deploy_end
   requires:
   - deploy_start
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-enable-ip-forward.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 720
 
-# NSDB-only tasks
-- id: zookeeper_and_cassandra_midonet
-  groups:
-  - nsdb
-  required_for:
-  - deploy_end
-  requires:
-  - setup_repositories_midonet
-  - firewall
-  type: puppet
-  reexecute_on:
-  - deploy_changes
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-nsdb.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
 
 # PRE-NEUTRON CONFIGURATION
-- id: deploy_api_midonet
+- id: deploy_cluster_midonet
   groups:
   - primary-controller
   - controller
@@ -121,13 +200,14 @@
   - firewall
   - primary-cluster-haproxy
   - cluster-haproxy
+  version: 2.0.0
   type: puppet
   reexecute_on:
   - deploy_changes
   parameters:
-    puppet_manifest: puppet/manifests/midonet-install-api.pp
+    puppet_manifest: puppet/manifests/midonet-install-cluster.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
+    timeout: 3600
 
 # In controllers, we have to install midolman 'before' the neutron
 # configuration, because subnet creates a the DHCP port in neutron
@@ -140,12 +220,14 @@
   - deploy_end
   - openstack-network-start
   requires:
-  - deploy_api_midonet
+  - deploy_cluster_midonet
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-install-agent.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
+    timeout: 4500
+
 
 # NEUTRON CONFIGURATION
 - id: openstack-network-midonet-replace-service-name
@@ -156,6 +238,7 @@
   - openstack-network-common-config
   required_for:
   - openstack-network-end
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-replace-guess-func.pp
@@ -168,8 +251,10 @@
   - controller
   requires:
   - openstack-network-midonet-replace-service-name
+  - setup_repositories_midonet
   required_for:
   - openstack-network-server-config
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-neutron-configure.pp
@@ -181,13 +266,165 @@
   - primary-controller
   requires:
   - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
   required_for:
   - openstack-network-end
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-neutron-networks.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 1440
+
+- id: openstack-network-midonet-cleanup-static
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
+  - openstack-network-midonet-networks
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-cleanup-static.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      changedAny($.midonet.gateway_type,$.midonet.static_linux_bridge_address,
+      $.midonet.static_fake_edge_router_address,
+      $.midonet.static_use_masquerade) and $.cluster.status != 'new'
+
+- id: openstack-network-midonet-cleanup-bgp
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
+  - openstack-network-midonet-networks
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-cleanup-bgp.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      (changedAny($.midonet.gateway_type,$.midonet.bgp_local_as,
+      $.midonet.bgp_neighbors) and $.cluster.status != 'new')
+
+- id: openstack-network-midonet-edge
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
+  - openstack-network-midonet-networks
+  - openstack-network-midonet-cleanup-static
+  - openstack-network-midonet-cleanup-bgp
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-setup.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+
+- id: openstack-network-midonet-edge-bgp
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
+  - openstack-network-midonet-networks
+  - openstack-network-midonet-edge
+  - openstack-network-midonet-cleanup-static
+  - openstack-network-midonet-cleanup-bgp
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-setup-bgp.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      (changedAny($.midonet.gateway_type,$.midonet.bgp_local_as,
+      $.midonet.bgp_neighbors) and $.midonet.gateway_type = 'bgp')
+
+- id: openstack-network-midonet-edge-static
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
+  - openstack-network-midonet-networks
+  - openstack-network-midonet-edge
+  - openstack-network-midonet-cleanup-bgp
+  - openstack-network-midonet-cleanup-static
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-setup-static.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      (changedAny($.midonet.gateway_type,$.midonet.static_linux_bridge_address,
+      $.midonet.static_fake_edge_router_address,
+      $.midonet.static_use_masquerade) and $.midonet.gateway_type = 'static')
+
+- id: openstack-network-midonet-edge-static-per-host
+  groups:
+  - primary-controller
+  requires:
+  - openstack-network-server-config
+  - openstack-network-midonet-config
+  - setup_repositories_midonet
+  - openstack-network-midonet-networks
+  - openstack-network-midonet-edge
+  - openstack-network-midonet-cleanup-static
+  - openstack-network-midonet-cleanup-bgp
+  - openstack-network-midonet-edge-static
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-setup-static-per-host.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      (changedAny($.midonet.gateway_type,$.midonet.static_linux_bridge_address,
+      $.midonet.static_fake_edge_router_address,
+      $.midonet.static_use_masquerade) and $.midonet.gateway_type = 'static')
 
 - id: openstack-network-midonet-compute-nova
   parameters:
@@ -197,12 +434,79 @@
   required_for:
   - openstack-network-end
   requires:
+  - setup_repositories_midonet
   - openstack-network-common-config
   - openstack-network-agents-l3
   - openstack-network-agents-metadata
+  version: 2.0.0
   type: puppet
   groups:
   - compute
+
+# NSDB-only tasks
+- id: zookeeper_and_cassandra_midonet
+  groups:
+  - nsdb
+  required_for:
+  - deploy_end
+  requires:
+  - deploy_start
+  - install_midonet_openstack_package
+  - install_midonet_package
+  - netconfig
+  version: 2.0.0
+  type: puppet
+  reexecute_on:
+  - deploy_changes
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-nsdb.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 3600
+
+# Analytics Only tasks
+
+- id: mem-analytics-java8
+  role:
+  - midonet-analytics
+  required_for:
+  - deploy_end
+  requires:
+  - deploy_start
+  - install_midonet_openstack_package
+  - install_midonet_package
+  - netconfig
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-java8.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+  condition:
+    yaql_exp: "$.midonet.mem = true and $.midonet.mem_insights = true"
+
+- id: mem-analytics-install
+  role:
+  - midonet-analytics
+  required_for:
+  - deploy_end
+  requires:
+  - deploy_start
+  - install_midonet_openstack_package
+  - install_midonet_package
+  - netconfig
+  - mem-analytics-java8
+  - setup_repositories_midonet
+  cross-depends:
+  - name: zookeeper_and_cassandra_midonet
+  - name: deploy_cluster_midonet
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-analytics.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 4500
+  condition:
+    yaql_exp: "$.midonet.mem = true and $.midonet.mem_insights = true"
 
 
 # Skipped tasks
@@ -222,8 +526,11 @@
   type: skipped
 - id: openstack-network-compute-nova
   type: skipped
-- id: netconfig
+  # This task tries to enable the service nova_compute but we already to that
+  # inside our custom midonet-compute-nova task.
+- id: enable_nova_compute_service
   type: skipped
+
 
 # POST-DEPLOYMENT TASKS
 
@@ -239,13 +546,15 @@
   - post_deployment_end
   requires:
   - configure_default_route
+  - post_deployment_start
+  version: 2.0.0
   type: puppet
   reexecute_on:
   - deploy_changes
   parameters:
     puppet_manifest: puppet/manifests/midonet-install-agent.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
+    timeout: 4500
 
 - id: tunnel-zones-midonet
   role:
@@ -253,15 +562,206 @@
   - controller
   - primary-controller
   - midonet-gw
+  reexecute_on:
+    - deploy_changes
   required_for:
   - post_deployment_end
   requires:
+  - post_deployment_start
   - agent-midonet-compute
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-host-registry.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 720
+
+- id: generate-openrc-gw
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - post_deployment_start
+  - tunnel-zones-midonet
+  version: 2.0.0
+  reexecute_on:
+    - deploy_changes
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-generate-openrc-for-gw.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+
+- id: midonet-edge-router-cleanup-bgp-gw
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - post_deployment_start
+  - tunnel-zones-midonet
+  type: puppet
+  reexecute_on:
+    - deploy_changes
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-cleanup-bgp-gw.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+  version: 2.0.0
+  condition:
+    yaql_exp: >
+      (changedAny($.midonet.gateway_type,$.midonet.bgp_local_as,
+      $.midonet.bgp_neighbors) and $.cluster.status != 'new' )
+
+- id: openstack-network-midonet-cleanup-static-per-host
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - post_deployment_start
+  - tunnel-zones-midonet
+  reexecute_on:
+    - deploy_changes
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-cleanup-static-per-host.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      changedAny($.midonet.gateway_type,$.midonet.static_linux_bridge_address,
+      $.midonet.static_fake_edge_router_address,
+      $.midonet.static_use_masquerade) and $.cluster.status != 'new'
+
+- id: openstack-network-midonet-cleanup-masq
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - post_deployment_start
+  - tunnel-zones-midonet
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - openstack-network-end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-cleanup-masquerade.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: >
+      changedAny($.midonet.gateway_type,$.midonet.static_linux_bridge_address,
+      $.midonet.static_fake_edge_router_address,
+      $.midonet.static_use_masquerade) and $.cluster.status != 'new'
+
+- id: midonet-bgp-interfaces
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - midonet-edge-router-cleanup-bgp-gw
+  - openstack-network-midonet-cleanup-static-per-host
+  - openstack-network-midonet-cleanup-masq
+  - post_deployment_start
+  - tunnel-zones-midonet
+  type: puppet
+  reexecute_on:
+    - deploy_changes
+  version: 2.0.0
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-bgp-interfaces.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+  condition:
+    yaql_exp: "$.midonet.gateway_type = 'bgp'"
+
+
+- id: midonet-edge-router-setup-bgp-gw
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - post_deployment_start
+  - midonet-bgp-interfaces
+  - tunnel-zones-midonet
+  - midonet-edge-router-cleanup-bgp-gw
+  - openstack-network-midonet-cleanup-masq
+  - openstack-network-midonet-cleanup-static-per-host
+  version: 2.0.0
+  type: puppet
+  reexecute_on:
+    - deploy_changes
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-edge-router-setup-bgp-gw.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+  condition:
+    yaql_exp: >
+      (changedAny($.midonet.gateway_type,$.midonet.bgp_local_as,
+      $.midonet.bgp_neighbors) and $.midonet.gateway_type = 'bgp')
+
+- id: openstack-network-midonet-gateway-static-router-ifaces
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - post_deployment_start
+  - midonet-bgp-interfaces
+  - tunnel-zones-midonet
+  - midonet-edge-router-cleanup-bgp-gw
+  - openstack-network-midonet-cleanup-masq
+  - openstack-network-midonet-cleanup-static-per-host
+  reexecute_on:
+    - deploy_changes
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-gateway-static-router-ifaces.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: "$.midonet.gateway_type = 'static'"
+
+- id: openstack-network-midonet-gateway-static
+  role:
+  - midonet-gw
+  required_for:
+  - post_deployment_end
+  requires:
+  - generate-openrc-gw
+  - post_deployment_start
+  - midonet-bgp-interfaces
+  - tunnel-zones-midonet
+  - midonet-edge-router-cleanup-bgp-gw
+  - openstack-network-midonet-cleanup-masq
+  - openstack-network-midonet-cleanup-static-per-host
+  - openstack-network-midonet-gateway-static-router-ifaces
+  reexecute_on:
+    - deploy_changes
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-gateway-static.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
+  condition:
+    yaql_exp: "$.midonet.gateway_type = 'static'"
+
 
 - id: rootwrap-midonet
   role:
@@ -272,22 +772,125 @@
   required_for:
   - post_deployment_end
   requires:
+  - post_deployment_start
   - agent-midonet-compute
+  version: 2.0.0
   type: puppet
   parameters:
     puppet_manifest: puppet/manifests/midonet-ensure-rootwrap.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 720
 
-- id: gateway-midonet
+# Midonet Enterprise Post-Deployment Tasks
+
+- id: mem-install
   role:
-  - midonet-gw
-  requires:
-  - tunnel-zones-midonet
+  - controller
+  - primary-controller
   required_for:
   - post_deployment_end
+  requires:
+  - post_deployment_start
+  type: puppet
+  reexecute_on:
+    - deploy_changes
+  version: 2.0.0
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-install-mem.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 3600
+  condition:
+    yaql_exp: "$.midonet.mem = true"
+
+- id: mem-horizon-override
+  role:
+  - controller
+  - primary-controller
+  required_for:
+  - post_deployment_end
+  requires:
+  - post_deployment_start
+  - mem-install
+  version: 2.0.0
+  reexecute_on:
+    - deploy_changes
   type: puppet
   parameters:
-    puppet_manifest: puppet/manifests/midonet-gateway-bgp.pp
+    puppet_manifest: puppet/manifests/midonet-mem-horizon-override.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 720
+  condition:
+    yaql_exp: "$.midonet.mem = true"
+
+- id: mem-restart-cluster
+  role:
+  - controller
+  - primary-controller
+  required_for:
+  - post_deployment_end
+  requires:
+  - post_deployment_start
+  - mem-install
+  - mem-horizon-override
+  - agent-midonet-compute
+  - tunnel-zones-midonet
+  - midonet-edge-router-setup-bgp-gw
+  - openstack-network-midonet-cleanup-static-per-host
+  reexecute_on:
+    - deploy_changes
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-restart-cluster.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+  condition:
+    yaql_exp: "$.midonet.mem = true and $.midonet.mem_insights = true"
+
+- id: mem-restart-agent
+  role:
+  - midonet-gw
+  - controller
+  - primary-controller
+  - compute
+  required_for:
+  - post_deployment_end
+  requires:
+  - post_deployment_start
+  - mem-install
+  - mem-horizon-override
+  - agent-midonet-compute
+  - tunnel-zones-midonet
+  - midonet-edge-router-setup-bgp-gw
+  - openstack-network-midonet-cleanup-static-per-host
+  version: 2.0.0
+  reexecute_on:
+    - deploy_changes
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-restart-agent.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
+  condition:
+    yaql_exp: "$.midonet.mem = true and $.midonet.mem_insights = true"
+
+# In the end..
+
+# Grab the Old Astute.yaml and save it somewhere so we can parse it
+# later and do cleanup
+
+- id: save_old_astute
+  type: shell
+  version: 2.0.0
+  role:
+    - controller
+    - primary-controller
+  required_for:
+  - post_deployment_end
+  requires:
+  - post_deployment_start
+  reexecute_on:
+    - deploy_changes
+  parameters:
+    cmd: cp /etc/fuel/cluster/{CLUSTER_ID}/astute.yaml /etc/fuel/cluster/astute.yaml.old
+    timeout: 180

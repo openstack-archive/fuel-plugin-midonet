@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Copyright 2016 Midokura SARL
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+set -e
+set -x
+
+FIP=<%= @fip %>
+NIC=<%= @nic %>
+EDGE_ROUTER=<%= @edge_router %>
+VETH0_IP=<%= @veth0_ip %>
+VETH1_IP=<%= @veth1_ip %>
+VETH_NETWORK=<%= @veth_network %>
+HOSTNAME=<%= @myhostname %>
+
+
+# Delete Route packets towards floating IP network through the bridge
+if [ -n "$(ip route | /bin/grep "${FIP} via ${VETH_1}")" ]; then
+  ip route delete ${FIP} via ${VETH1_IP}
+  echo "Succesfully deleted route to send packets on the bridge"
+fi
+
+for host in ${HOSTNAME//,/ }
+do
+  HOST_ID=$(midonet-cli -A -e host list | grep ${host} | awk '{ print $2 }')
+
+  ROUTER_ID=$(midonet-cli -A -e router list | grep ${EDGE_ROUTER} | awk '{ print $2 }')
+  PORT_ID=$(midonet-cli -A -e host ${HOST_ID} binding list | grep veth1 | awk '{ print $6}')
+  ROUTE_ID=$(midonet-cli -A -e router ${ROUTER_ID} route list  | grep "src 0.0.0.0/0 dst 0.0.0.0/0 gw ${VETH0_IP} port ${PORT_ID}" | awk '{ print $2 }')
+
+  if [ -n ${ROUTE_ID} ]; then
+    midonet-cli -e router ${ROUTER_ID} delete route ${ROUTE_ID}
+    echo "Successfully deleted default route on edge router"
+  fi
+done
