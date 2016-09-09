@@ -1,0 +1,11 @@
+neutron::core_plugin: 'midonet.neutron.plugin_v2.MidonetPluginV2'
+neutron::service_plugins:
+  - midonet.neutron.services.firewall.plugin.MidonetFirewallPlugin
+  - lbaas
+  - midonet.neutron.services.l3.l3_midonet.MidonetL3ServicePlugin
+horizon::neutron_options:
+  - enable_lb: true
+  - enable_firewall: true
+
+neutron::server::service_providers:
+  - LOADBALANCER:Midonet:midonet.neutron.services.loadbalancer.driver.MidonetLoadbalancerDriver:default
