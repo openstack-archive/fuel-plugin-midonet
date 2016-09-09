@@ -18,77 +18,77 @@
   - logging
   - hiera
   - globals
-  - netconfig-midonet
-
-- id: midonet-gw
-  parameters:
-    strategy:
-      type: parallel
-  required_for:
-  - deploy_end
-  requires:
-  - nsdb
-  role:
-  - midonet-gw
-  tasks:
-  - logging
-  - hiera
-  - globals
-  - netconfig-midonet
-  type: group
-
-#
-# DEPLOYMENT
-#
-
-- id: netconfig-midonet
-  parameters:
-    puppet_manifest: /etc/puppet/modules/osnailyfacter/modular/netconfig/netconfig.pp
-    puppet_modules: /etc/puppet/modules
-    timeout: 3600
-    cwd: /
-  required_for:
   - netconfig
-  requires:
-  - tools
-  groups:
-  - /.*/
-  type: puppet
-  version: 2.0.0
 
-# First independent tasks
-- id: setup_repositories_midonet
-  groups:
+
+# Override neutron params
+- id: install_common_deps
+  role:
   - primary-controller
   - controller
   - compute
   - nsdb
   - midonet-gw
-  required_for:
-  - deploy_end
-  requires:
-  - netconfig
-  type: puppet
+  - midonet-analytics
+  type: shell
+  requires: [pre_deployment_start]
+  required_for: [pre_deployment_end]
+  version: 2.0.0
   parameters:
-    puppet_manifest: puppet/manifests/midonet-define-repositories.pp
+    cmd: bash install_midonet_common_modules_and_gems.sh
+    timeout: 1440
+
+# Override neutron params
+- id: neutron-override
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: puppet
+  requires: [pre_deployment_start]
+  required_for: [pre_deployment_end]
+  version: 2.0.0
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-override-hiera.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 1440
 
-- id: enable_ip_forward_midonet
-  groups:
-  - compute
-  - controller
+# Install the MidoNet Package. Everywhere
+- id: install_midonet_package
+  role:
   - primary-controller
+  - controller
+  - compute
+  - nsdb
   - midonet-gw
-  required_for:
-  - deploy_end
-  requires:
-  - deploy_start
-  type: puppet
+  - midonet-analytics
+  type: shell
+  requires: [deploy_start,setup_repositories]
+  required_for: [fuel_pkgs]
+  version: 2.0.0
   parameters:
-    puppet_manifest: puppet/manifests/midonet-enable-ip-forward.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 720
+    cmd: bash install_midonet_package_from_source.sh
+    timeout: 1440
+
+# Install the MidoNet_Openstack Package where needed. For Java, Zookeeper and Cassandra
+- id: install_midonet_openstack_package
+  role:
+  - primary-controller
+  - controller
+  - compute
+  - nsdb
+  - midonet-gw
+  - midonet-analytics
+  type: shell
+  requires: [deploy_start,setup_repositories]
+  required_for: [fuel_pkgs]
+  version: 2.0.0
+  parameters:
+    cmd: bash install_midonet_openstack_package.sh
+    timeout: 1440
 
 # NSDB-only tasks
 - id: zookeeper_and_cassandra_midonet
@@ -97,8 +97,10 @@
   required_for:
   - deploy_end
   requires:
-  - setup_repositories_midonet
-  - firewall
+  - deploy_start
+  - install_midonet_openstack_package
+  - install_midonet_package
+  - netconfig
   type: puppet
   reexecute_on:
   - deploy_changes
@@ -106,103 +108,6 @@
     puppet_manifest: puppet/manifests/midonet-nsdb.pp
     puppet_modules: "puppet/modules/:/etc/puppet/modules/"
     timeout: 1440
-
-# PRE-NEUTRON CONFIGURATION
-- id: deploy_api_midonet
-  groups:
-  - primary-controller
-  - controller
-  required_for:
-  - deploy_end
-  - openstack-network-start
-  requires:
-  - setup_repositories_midonet
-  - enable_ip_forward_midonet
-  - firewall
-  - primary-cluster-haproxy
-  - cluster-haproxy
-  type: puppet
-  reexecute_on:
-  - deploy_changes
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-install-api.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-
-# In controllers, we have to install midolman 'before' the neutron
-# configuration, because subnet creates a the DHCP port in neutron
-# and we need to do the binding.
-- id: agent-midonet-controller
-  groups:
-  - primary-controller
-  - controller
-  required_for:
-  - deploy_end
-  - openstack-network-start
-  requires:
-  - deploy_api_midonet
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-install-agent.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-
-# NEUTRON CONFIGURATION
-- id: openstack-network-midonet-replace-service-name
-  groups:
-  - primary-controller
-  - controller
-  requires:
-  - openstack-network-common-config
-  required_for:
-  - openstack-network-end
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-replace-guess-func.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-
-- id: openstack-network-midonet-config
-  groups:
-  - primary-controller
-  - controller
-  requires:
-  - openstack-network-midonet-replace-service-name
-  required_for:
-  - openstack-network-server-config
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-neutron-configure.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-
-- id: openstack-network-midonet-networks
-  groups:
-  - primary-controller
-  requires:
-  - openstack-network-server-config
-  required_for:
-  - openstack-network-end
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-neutron-networks.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-
-- id: openstack-network-midonet-compute-nova
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-compute-nova.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-  required_for:
-  - openstack-network-end
-  requires:
-  - openstack-network-common-config
-  - openstack-network-agents-l3
-  - openstack-network-agents-metadata
-  type: puppet
-  groups:
-  - compute
 
 
 # Skipped tasks
@@ -222,72 +127,3 @@
   type: skipped
 - id: openstack-network-compute-nova
   type: skipped
-- id: netconfig
-  type: skipped
-
-# POST-DEPLOYMENT TASKS
-
-# The task configure_default_route reinstalls openvswitch-switch
-# and removes midolman. This task only runs on compute hosts, so
-# we have to make sure that midolman is installed 'after' the
-# 'configure_default_route' task has run
-- id: agent-midonet-compute
-  role:
-  - compute
-  - midonet-gw
-  required_for:
-  - post_deployment_end
-  requires:
-  - configure_default_route
-  type: puppet
-  reexecute_on:
-  - deploy_changes
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-install-agent.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 1440
-
-- id: tunnel-zones-midonet
-  role:
-  - compute
-  - controller
-  - primary-controller
-  - midonet-gw
-  required_for:
-  - post_deployment_end
-  requires:
-  - agent-midonet-compute
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-host-registry.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 720
-
-- id: rootwrap-midonet
-  role:
-  - compute
-  - controller
-  - primary-controller
-  - midonet-gw
-  required_for:
-  - post_deployment_end
-  requires:
-  - agent-midonet-compute
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-ensure-rootwrap.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 720
-
-- id: gateway-midonet
-  role:
-  - midonet-gw
-  requires:
-  - tunnel-zones-midonet
-  required_for:
-  - post_deployment_end
-  type: puppet
-  parameters:
-    puppet_manifest: puppet/manifests/midonet-gateway-bgp.pp
-    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
-    timeout: 720

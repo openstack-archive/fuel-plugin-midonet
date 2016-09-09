@@ -1,3 +1,8 @@
-neutron::core_plugin: 'midonet.neutron.plugin_v1.MidonetPluginV2'
-neutron::agents::dhcp::interface_driver: 'neutron.agent.linux.interface.MidonetInterfaceDriver'
-neutron::agents::dhcp::dhcp_driver: 'midonet.neutron.agent.midonet_driver.DhcpNoOpDriver'
+neutron::core_plugin: 'midonet.neutron.plugin_v2.MidonetPluginV2'
+neutron::service_plugins:
+  - midonet.neutron.services.firewall.plugin.MidonetFirewallPlugin
+  - lbaas
+  - midonet.neutron.services.l3.l3_midonet.MidonetL3ServicePlugin
+horizon::neutron_options:
+  - enable_lb: true
+  - enable_firewall: true

@@ -25,25 +25,25 @@ $public_vip           = hiera('public_vip')
 $keystone_data        = hiera_hash('keystone')
 $access_data          = hiera_hash('access')
 $public_ssl_hash      = hiera('public_ssl')
+$cass_ips             = values($nsdb_mgmt_ips)
+$mem                  = $midonet_settings['mem']
 
-file_line {'disable_ipv6':
-   path => '/etc/default/tomcat7',
-   line => 'JAVA_OPTS="${JAVA_OPTS} -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses"'
-} ->
 
 class {'::midonet::midonet_api':
-  zk_servers           => $zoo_ips_hash,
+  is_mem               => $mem,
+  zookeeper_servers    => $zoo_ips_hash,
+  cassandra_servers    => $cass_ips,
   keystone_auth        => true,
   keystone_host        => $management_vip,
   keystone_admin_token => $keystone_data['admin_token'],
   keystone_tenant_name => $access_data['tenant'],
   bind_address         => $::ipaddress_br_mgmt,
   api_ip               => $public_vip,
-  api_port             => '8081',
+  api_port             => '8181',
 }
 
 # HA proxy configuration
-Haproxy::Service        { use_include   => true }
+Haproxy::Service        { use_include => true }
 Haproxy::Balancermember { use_include => true }
 
 Openstack::Ha::Haproxy_service {
@@ -53,7 +53,7 @@ Openstack::Ha::Haproxy_service {
   internal_virtual_ip => $management_vip
 }
 
-openstack::ha::haproxy_service { 'midonetapi':
+openstack::ha::haproxy_service { 'midonetcluster':
   order                  => 199,
   listen_port            => 8081,
   balancermember_port    => 8081,
@@ -61,8 +61,8 @@ openstack::ha::haproxy_service { 'midonetapi':
   before_start           => true,
   public                 => true,
   haproxy_config_options => {
-    'balance'        => 'roundrobin',
-    'option'         => ['httplog'],
+    'balance' => 'roundrobin',
+    'option'  => ['httplog'],
   },
   balancermember_options => 'check',
 }
@@ -83,7 +83,7 @@ Haproxy::Balancermember <||> -> Exec['haproxy reload']
 class { 'firewall': }
 
 firewall {'502 Midonet api':
-  port => '8081',
-  proto => 'tcp',
+  port   => '8181',
+  proto  => 'tcp',
   action => 'accept',
 }

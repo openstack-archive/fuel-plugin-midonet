@@ -37,7 +37,7 @@ exec {'service midolman restart':
 
 midonet_host_registry {$::fqdn:
   ensure              => present,
-  midonet_api_url     => "http://${api_ip}:8081",
+  midonet_api_url     => "http://${api_ip}:8181",
   username            => $username,
   password            => $password,
   tenant_name         => $tenant_name,

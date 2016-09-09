@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-install-agent.pp')
+notice('MODULAR: midonet-install-cluster.pp')
 
 # Extract data from hiera
 $network_metadata = hiera_hash('network_metadata')
@@ -20,12 +20,12 @@ $segmentation_type = $neutron_config['L2']['segmentation_type']
 $nsdb_hash        = get_nodes_hash_by_roles($network_metadata, ['nsdb'])
 $nsdb_mgmt_ips    = get_node_to_ipaddr_map_by_network_role($nsdb_hash, 'management')
 $zoo_ips_hash     = generate_api_zookeeper_ips(values($nsdb_mgmt_ips))
-$cass_ips         = values($nsdb_mgmt_ips)
 $api_ip           = hiera('management_vip')
 $access_data      = hiera_hash('access')
 $username         = $access_data['user']
 $password         = $access_data['password']
 $tenant_name      = $access_data['tenant']
+$mem              = $midonet_settings['mem']
 
 $ovsdb_service_name = $operatingsystem ? {
   'CentOS' => 'openvswitch',
@@ -51,12 +51,12 @@ package {$openvswitch_package:
 } ->
 
 class {'::midonet::midonet_agent':
-  zk_servers      => $zoo_ips_hash,
-  cassandra_seeds => $cass_ips
+  zookeeper_hosts => $zoo_ips_hash,
+  is_mem          => $mem
 } ->
 
 class {'::midonet::midonet_cli':
-  api_endpoint => "http://${api_ip}:8081/midonet-api",
+  api_endpoint => "http://${api_ip}:8181/midonet-api",
   username     => $username,
   password     => $password,
   tenant_name  => $tenant_name,
