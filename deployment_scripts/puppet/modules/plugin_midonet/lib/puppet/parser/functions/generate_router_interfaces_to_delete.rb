@@ -1,4 +1,4 @@
-#    Copyright 2015 Midokura SARL.
+#    Copyright 2015 Midokura SARL, Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -11,12 +11,22 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-replace-guess-func.pp')
 
-# NOTE: This replacement may be only needed on Ubuntu hosts
-file_line { 'replace_guess':
-  path     => '/usr/share/neutron-common/plugin_guess_func',
-  match    => '"neutron.plugins.midonet.plugin.MidonetPluginV2"',
-  line     => "\t\"midonet.neutron.plugin_v2.MidonetPluginV2\")",
-  multiple => true
-}
+require 'csv'
+
+module Puppet::Parser::Functions
+  newfunction(:generate_router_interfaces_to_delete, :type => :rvalue, :doc => <<-EOS
+    This function returns the port bindings to delete to pass to the shell script
+    Since you can't send an array to a bash script, let's send a CSV instead.
+    EOS
+  ) do |argv|
+    controllers_map = argv[0]
+    result = ''
+    controllers_map.each do |key,value|
+      port_name = 'port-static-' + value['fqdn']
+      result << port_name + ','
+    end
+
+    return result.chop
+  end
+end
