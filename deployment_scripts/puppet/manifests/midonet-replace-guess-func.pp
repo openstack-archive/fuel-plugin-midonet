@@ -15,8 +15,8 @@ notice('MODULAR: midonet-replace-guess-func.pp')
 
 # NOTE: This replacement may be only needed on Ubuntu hosts
 file_line { 'replace_guess':
-   path     => '/usr/share/neutron-common/plugin_guess_func',
-   match    => '"neutron.plugins.midonet.plugin.MidonetPluginV2"',
-   line     => "\t\"midonet.neutron.plugin_v1.MidonetPluginV2\")",
-   multiple => true
+  path     => '/usr/share/neutron-common/plugin_guess_func',
+  match    => '"neutron.plugins.midonet.plugin.MidonetPluginV2"',
+  line     => "\t\"midonet.neutron.plugin_v2.MidonetPluginV2\")",
+  multiple => true
 }

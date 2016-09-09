@@ -11,12 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-override-hiera.pp')
+notice('MODULAR: midonet-restart-agent.pp')
 
-$midonet_settings = hiera('midonet')
-$mem = $midonet_settings['mem']
+exec { 'service midolman restart':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  } ->
 
-file {'/etc/hiera/plugins/midonet.yaml':
-    ensure => file,
-    source => '/etc/fuel/plugins/midonet-4.1/puppet/files/midonet.yaml'
-}
+exec { 'sleep 4':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  } ->
+
+exec { 'service midonet-jmxscraper restart':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  }
