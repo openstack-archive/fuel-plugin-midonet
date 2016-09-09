@@ -11,16 +11,22 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+
+require 'csv'
+
 module Puppet::Parser::Functions
-  newfunction(:generate_remote_peers, :type => :rvalue, :doc => <<-EOS
-    Generate remote peers according to the input values in the plugin settings
+  newfunction(:generate_router_interfaces_to_delete, :type => :rvalue, :doc => <<-EOS
+    This function returns the port bindings to delete to pass to the shell script
+    Since you can't send an array to a bash script, let's send a CSV instead.
     EOS
   ) do |argv|
-      mn_settings = argv[0]
-      result = []
-      if not mn_settings['remote_ip1'].empty? and not mn_settings['remote_as1'].empty?
-          result.push({"as" => mn_settings['remote_as1'], "ip" => mn_settings['remote_ip1']})
-      end
-      return result
+    controllers_map = argv[0]
+    result = ''
+    controllers_map.each do |key,value|
+      port_name = 'port-static-' + argv[1]
+      result << port_name + ','
+    end
+
+    return result.chop
   end
 end
