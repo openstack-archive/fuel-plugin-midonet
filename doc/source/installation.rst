@@ -19,7 +19,7 @@ To install the MidoNet Fuel plugin:
 
    ::
 
-    # fuel plugins --install midonet-fuel-plugin-4.0-4.0.0-1.noarch.rpm
+    # fuel plugins --install midonet-4.1-4.1.0-1.noarch.rpm
 
 #. Verify that the plugin is installed correctly:
    ::
@@ -27,7 +27,7 @@ To install the MidoNet Fuel plugin:
     # fuel plugins
     id | name    | version | package_version
     ---|---------|---------|----------------
-    9  | midonet | 4.0.0   | 4.0.0
+    9  | midonet | 4.1.0   | 4.0.0
 
 .. _`Fuel Plugin Catalog`: https://www.mirantis.com/products/openstack-drivers-and-plugins/fuel-plugins/
 .. _`Fuel CLI`: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/cli.html
