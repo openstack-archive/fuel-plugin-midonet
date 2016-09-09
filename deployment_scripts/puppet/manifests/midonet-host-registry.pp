@@ -21,7 +21,7 @@ $password    = $access_data['password']
 $tenant_name = $access_data['tenant']
 
 # Plugin settings data
-$midonet_settings = hiera_hash('midonet-fuel-plugin')
+$midonet_settings = hiera_hash('midonet')
 $tz_type = $midonet_settings['tunnel_type']
 
 $service_path = $operatingsystem ? {
@@ -37,7 +37,7 @@ exec {'service midolman restart':
 
 midonet_host_registry {$::fqdn:
   ensure              => present,
-  midonet_api_url     => "http://${api_ip}:8081",
+  midonet_api_url     => "http://${api_ip}:8181",
   username            => $username,
   password            => $password,
   tenant_name         => $tenant_name,
