@@ -11,7 +11,7 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-neutron-networks.pp')
+notice('MODULAR: midonet-edge-router-setup-bgp.pp')
 
 # Extract data from hiera
 $access_data           = hiera_hash('access')
@@ -32,54 +32,22 @@ $floating_range_start = $midonet_settings['floating_ip_range_start']
 $floating_range_end   = $midonet_settings['floating_ip_range_end']
 $floating_cidr        = $midonet_settings['floating_cidr']
 $floating_gateway_ip  = $midonet_settings['gateway']
+$bgp_subnets          = $midonet_settings['bgp_cidr']
+
 
 $allocation_pools = "start=$floating_range_start,end=$floating_range_end"
 
-service { 'neutron-server':
-  ensure => running,
+$defaults_for_subnet = {
+  ensure       => present,
+  enable_dhcp  => false,
+  tenant_name  => $external_net['tenant'],
+  network_name => 'edge-net'
 }
+create_resources('neutron_subnet',
+                generate_bgp_cidr_hash($bgp_subnets),
+                $defaults_for_subnet)
 
-neutron_network { $tenant_net_name:
-  ensure                    => present,
-  router_external           => $tenant_net['L2']['router_ext'],
-  tenant_name               => $tenant_net['tenant'],
-  shared                    => $tenant_net['shared']
-} ->
 
-neutron_subnet { "${tenant_net_name}__subnet":
-  ensure          => present,
-  cidr            => $tenant_net['L3']['subnet'],
-  network_name    => $tenant_net_name,
-  tenant_name     => $tenant_net['tenant'],
-  gateway_ip      => $tenant_net['L3']['gateway'],
-  enable_dhcp     => $tenant_net['L3']['enable_dhcp'],
-  dns_nameservers => $tenant_net['L3']['nameservers']
-} ->
-
-neutron_network { $external_net_name:
-  ensure                    => present,
-  router_external           => $external_net['L2']['router_ext'],
-  tenant_name               => $external_net['tenant'],
-  shared                    => $external_net['shared']
-} ->
-
-neutron_subnet { "${external_net_name}__subnet":
-  ensure           => present,
-  cidr             => $floating_cidr,
-  network_name     => $external_net_name,
-  tenant_name      => $external_net['tenant'],
-  gateway_ip       => $floating_gateway_ip,
-  enable_dhcp      => $external_net['L3']['enable_dhcp'],
-  dns_nameservers  => $external_net['L3']['nameservers'],
-  allocation_pools => $allocation_pools
-} ->
-
-neutron_router { 'mido_router':
-  ensure               => present,
-  tenant_name          => $external_net['tenant'],
-  gateway_network_name => $external_net_name,
-} ->
-
-neutron_router_interface { "mido_router:${tenant_net_name}__subnet":
-  ensure => present,
-}
+Neutron_Router<||> ->
+Neutron_router_interface<||> ->
+Neutron_subnet<||>

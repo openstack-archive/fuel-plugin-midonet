@@ -4,7 +4,7 @@ $username         = $access_data['user']
 $password         = $access_data['password']
 $tenant_name      = $access_data['tenant']
 
-$midonet_settings = hiera_hash('midonet-fuel-plugin')
+$midonet_settings = hiera_hash('midonet')
 $f_net_cidr = split($midonet_settings['floating_cidr'], '/')
 $remote_peers = generate_remote_peers($midonet_settings)
 
@@ -50,7 +50,7 @@ exec {"set up external bridge":
 
 file {"/etc/init/midonet-network.conf":
   ensure => present,
-  source => "/etc/fuel/plugins/midonet-fuel-plugin-4.0/puppet/files/startup.conf"
+  source => "/etc/fuel/plugins/midonet-4.0/puppet/files/startup.conf"
 } ->
 
 midonet_gateway { $::fqdn:
