@@ -16,3 +16,16 @@ midonet-gw:
   weight: 100
   conflicts:
     - controller
+  limits:
+    max: 1
+
+midonet-analytics:
+  name: MidoNet Analytics Node
+  description: Analytics Node for Midonet MEM
+  has_primary: false
+  public_ip_required: true
+  weight: 200
+  conflicts:
+    - controller
+    - midonet-gw
+    - nsdb
