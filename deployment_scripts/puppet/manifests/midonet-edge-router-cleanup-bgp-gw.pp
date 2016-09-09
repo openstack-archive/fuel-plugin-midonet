@@ -11,13 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-enable-ip.forward.pp')
+notice('MODULAR: midonet-edge-router-cleanup-bgp-gw.pp')
 
-sysctl::value { 'net.ipv4.ip_forward':
-  value => '1'
-} ->
 
-exec { 'load-sysctl':
-  command     => '/sbin/sysctl -p /etc/sysctl.conf',
-  refreshonly => true
-}
+  file {'/etc/init/midonet-network.conf':
+    ensure => absent,
+    source => '/etc/fuel/plugins/midonet-5.0/puppet/files/startup.conf'
+  }
