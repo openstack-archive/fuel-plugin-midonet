@@ -13,18 +13,10 @@
 #    under the License.
 notice('MODULAR: midonet-override-hiera.pp')
 
-$midonet_settings = hiera('midonet-fuel-plugin')
+$midonet_settings = hiera('midonet')
 $mem = $midonet_settings['mem']
 
-file {'/etc/hiera/plugins/midonet-fuel-plugin.yaml':
+file {'/etc/hiera/plugins/midonet.yaml':
     ensure => file,
-    source => '/etc/fuel/plugins/midonet-fuel-plugin-4.0/puppet/files/midonet-fuel-plugin.yaml'
-}
-
-if $mem == false {
-    # MidoNet 2015.06 OSS does not support fernet tokens
-    file_line {'token_provider':
-        path => '/etc/hiera/plugins/midonet-fuel-plugin.yaml',
-        line => 'token_provider: uuid'
-    }
+    source => '/etc/fuel/plugins/midonet-5.0/puppet/files/midonet.yaml'
 }
