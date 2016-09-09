@@ -86,4 +86,4 @@ ENV/
 .spyderproject
 *.swp
 .build/
-midonet-fuel-plugin-*.rpm
+midonet-*.rpm
