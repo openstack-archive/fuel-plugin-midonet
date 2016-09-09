@@ -3,9 +3,9 @@ Mirantis Fuel MidoNet plugin
 
 Compatible versions:
 
-- Mirantis Fuel 8.0
-- MidoNet v2015.6
-- Midokura Enterprise MidoNet 1.9
+- Mirantis Fuel 9.0
+- MidoNet v5.2
+- Midokura Enterprise MidoNet 5.2
 
 How to build the plugin
 -----------------------

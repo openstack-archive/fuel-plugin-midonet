@@ -20,11 +20,3 @@ file {'/etc/hiera/plugins/midonet-fuel-plugin.yaml':
     ensure => file,
     source => '/etc/fuel/plugins/midonet-fuel-plugin-4.0/puppet/files/midonet-fuel-plugin.yaml'
 }
-
-if $mem == false {
-    # MidoNet 2015.06 OSS does not support fernet tokens
-    file_line {'token_provider':
-        path => '/etc/hiera/plugins/midonet-fuel-plugin.yaml',
-        line => 'token_provider: uuid'
-    }
-}
