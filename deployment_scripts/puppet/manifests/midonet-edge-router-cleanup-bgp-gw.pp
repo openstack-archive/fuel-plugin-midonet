@@ -11,12 +11,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-override-hiera.pp')
+notice('MODULAR: midonet-edge-router-cleanup-bgp-gw.pp')
 
-$midonet_settings = hiera('midonet')
-$mem = $midonet_settings['mem']
 
-file {'/etc/hiera/plugins/midonet.yaml':
-    ensure => file,
-    source => '/etc/fuel/plugins/midonet-4.1/puppet/files/midonet.yaml'
-}
+  file {"/etc/init/midonet-network.conf":
+    ensure => absent,
+    source => "/etc/fuel/plugins/midonet-4.1/puppet/files/startup.conf"
+  }
