@@ -11,13 +11,16 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-enable-ip.forward.pp')
+notice('MODULAR: midonet-restart-agent.pp')
 
-sysctl::value { 'net.ipv4.ip_forward':
-  value => '1'
-} ->
+exec { 'service midolman restart':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  } ->
 
-exec { 'load-sysctl':
-  command     => '/sbin/sysctl -p /etc/sysctl.conf',
-  refreshonly => true
-}
+exec { 'sleep 4':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  } ->
+
+exec { 'service midonet-jmxscraper restart':
+    path => '/usr/bin:/usr/sbin:/sbin:/bin'
+  }

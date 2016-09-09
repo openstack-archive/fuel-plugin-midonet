@@ -3,9 +3,9 @@ Mirantis Fuel MidoNet plugin
 
 Compatible versions:
 
-- Mirantis Fuel 8.0
-- MidoNet v2015.6
-- Midokura Enterprise MidoNet 1.9
+- Mirantis Fuel 9.0
+- MidoNet v5.2
+- Midokura Enterprise MidoNet 5.2
 
 How to build the plugin
 -----------------------
@@ -24,7 +24,7 @@ How to build the plugin
    $ cd fuel-plugin-midonet
    $ fpb --build .
 
-A *rpm* called `midonet-fuel-plugin-4.0-4.0.0-1.noarch.rpm` should be created in
+A *rpm* called `midonet-4.1-4.0.0-1.noarch.rpm` should be created in
 the same directory.
 
 Follow the documentation to install and configure the plugin. You can read the
