@@ -1,0 +1,21 @@
+ProxyPreserveHost On
+Alias /midonet-manager "/var/www/html/midonet-manager"
+
+ProxyPass        /midonet-api  http://<%= @public_vip %>:8181/midonet-api
+ProxyPassReverse /midonet-api  http://<%= @public_vip %>:8181/midonet-api
+
+ProxyPass        /subscription ws://<%= @public_vip %>:8007/subscription
+ProxyPassReverse /subscription ws://<%= @public_vip %>:8007/subscription
+
+ProxyPass        /trace        ws://<%= @public_vip %>:8460/trace
+ProxyPassReverse /trace        ws://<%= @public_vip %>:8460/trace
+
+ProxyPass        /fabric       ws://<%= @public_vip %>:8009/fabric
+ProxyPassReverse /fabric       ws://<%= @public_vip %>:8009/fabric
+
+ProxyPass        /analytics    ws://<%= @ana_mgmt_ip %>:8080/analytics
+ProxyPassReverse /analytics    ws://<%= @ana_mgmt_ip %>:8080/analytics
+
+Header set    Access-Control-Allow-Origin  *
+Header append Access-Control-Allow-Headers Content-Type
+Header append Access-Control-Allow-Headers X-Auth-Token
