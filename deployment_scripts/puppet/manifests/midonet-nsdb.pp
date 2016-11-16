@@ -15,8 +15,8 @@ notice('MODULAR: midonet-nsdb.pp')
 
 # Extract data from hiera
 $fuel_settings    = parseyaml($astute_settings_yaml)
-$network_metadata = hiera_hash('network_metadata')
-$nsdb_map         = get_nodes_hash_by_roles($network_metadata, ['nsdb'])
+$net_metadata     = hiera_hash('network_metadata')
+$nsdb_map         = get_nodes_hash_by_roles($net_metadata, ['nsdb'])
 $zoo_hash         = generate_zookeeper_hash($nsdb_map)
 $nsdb_mgmt_map    = get_node_to_ipaddr_map_by_network_role($nsdb_map, 'management')
 

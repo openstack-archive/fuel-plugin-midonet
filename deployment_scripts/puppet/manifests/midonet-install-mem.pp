@@ -67,6 +67,17 @@ class {'midonet::mem':
   mem_fabric_port       => '',
 }
 
+exec { 'https override':
+  command   => "sed -i 's/wss:/ws:/g' /var/www/html/midonet-manager/config/client.js",
+  path      => '/usr/bin:/usr/sbin:/bin:/sbin',
+  logoutput => true,
+  provider  => 'shell',
+  tries     => 10,
+  try_sleep => 10,
+  returns   => [0, ''],
+  require   => File['midonet-manager-config']
+}
+
   exec { 'a2enmod headers':
       path    => '/usr/bin:/usr/sbin:/bin',
       alias   => 'enable-mod-headers',
