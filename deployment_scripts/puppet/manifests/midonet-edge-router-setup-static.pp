@@ -17,8 +17,6 @@ include ::stdlib
 # Extract data from hiera
 $access_data           = hiera_hash('access')
 $keystone_admin_tenant = $access_data['tenant']
-$net_metadata          = hiera_hash('network_metadata')
-$node_roles            = $net_metadata['nodes'][$::hostname]['node_roles']
 $neutron_settings      = hiera('neutron_config')
 $external_net_name     = $neutron_settings['default_floating_net']
 $tenant_net_name       = $neutron_settings['default_private_net']

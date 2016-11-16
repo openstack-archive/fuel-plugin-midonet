@@ -13,10 +13,8 @@
 #    under the License.
 notice('MODULAR: midonet-install-mem.pp')
 include ::stdlib
-
 # Extract data from hiera
 $ssl_hash                   = hiera_hash('use_ssl', {})
-
 $midonet_settings           = hiera('midonet')
 $net_metadata               = hiera_hash('network_metadata')
 $controllers_map            = get_nodes_hash_by_roles($net_metadata, ['controller', 'primary-controller'])
@@ -34,27 +32,19 @@ $mem                        = $midonet_settings['mem']
 $admin_identity_protocol    = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'protocol', 'http')
 $metadata_hash              = hiera_hash('quantum_settings', {})
 $metadata_secret            = pick($metadata_hash['metadata']['metadata_proxy_shared_secret'], 'root')
-
 $ana_hash               = get_nodes_hash_by_roles($net_metadata, ['midonet-analytics'])
 $ana_mgmt_ip_hash       = get_node_to_ipaddr_map_by_network_role($ana_hash, 'management')
 $ana_mgmt_ip_list       = values($ana_mgmt_ip_hash)
 $ana_keys               = keys($ana_hash)
-
 $ana_mgmt_ip            = empty($ana_keys)? {true => $public_vip , default => $ana_mgmt_ip_list[0] }
-
-
-$public_ssl             = hiera_hash('public_ssl')
-$ssl_horizon            = $public_ssl['horizon']
-
+$ssl_horizon            = $public_ssl_hash['horizon']
 $is_insights            = $midonet_settings['mem_insights']
-
 service { 'apache2':
     ensure     => running,
     enable     => true,
     hasrestart => true,
     hasstatus  => true,
 }
-
 #Add MEM manager class
 class {'midonet::mem':
   cluster_ip            => $public_vip,
@@ -67,6 +57,43 @@ class {'midonet::mem':
   mem_fabric_port       => '',
 }
 
+
+
+if ($public_ssl_hash['horizon'])
+{
+  exec { 'https override':
+    command   => "sed -i 's/http:/https:/g' /var/www/html/midonet-manager/config/client.js",
+    path      => '/usr/bin:/usr/sbin:/bin:/sbin',
+    logoutput => true,
+    provider  => 'shell',
+    tries     => 10,
+    try_sleep => 10,
+    returns   => [0, ''],
+    require   => File['midonet-manager-config']
+  }
+  exec { 'wss override':
+    command   => "sed -i 's/ws:/wss:/g' /var/www/html/midonet-manager/config/client.js",
+    path      => '/usr/bin:/usr/sbin:/bin:/sbin',
+    logoutput => true,
+    provider  => 'shell',
+    tries     => 10,
+    try_sleep => 10,
+    returns   => [0, ''],
+    require   => File['midonet-manager-config']
+  }
+}
+else {
+  exec { 'wss override':
+    command   => "sed -i 's/wss:/ws:/g' /var/www/html/midonet-manager/config/client.js",
+    path      => '/usr/bin:/usr/sbin:/bin:/sbin',
+    logoutput => true,
+    provider  => 'shell',
+    tries     => 10,
+    try_sleep => 10,
+    returns   => [0, ''],
+    require   => File['midonet-manager-config']
+  }
+}
   exec { 'a2enmod headers':
       path    => '/usr/bin:/usr/sbin:/bin',
       alias   => 'enable-mod-headers',
@@ -74,7 +101,6 @@ class {'midonet::mem':
       notify  => Service['apache2'],
       tag     => 'a2enmod-mem'
   }
-
   exec { 'a2enmod proxy':
       path    => '/usr/bin:/usr/sbin:/bin',
       alias   => 'enable-mod-proxy',
@@ -82,7 +108,6 @@ class {'midonet::mem':
       notify  => Service['apache2'],
       tag     => 'a2enmod-mem'
   }
-
   exec { 'a2enmod proxy_http':
       path    => '/usr/bin:/usr/sbin:/bin',
       alias   => 'enable-mod-proxy-http',
@@ -90,7 +115,6 @@ class {'midonet::mem':
       notify  => Service['apache2'],
       tag     => 'a2enmod-mem'
   }
-
   exec { 'a2enmod proxy_wstunnel':
       path    => '/usr/bin:/usr/sbin:/bin',
       alias   => 'enable-mod-proxy-wstunnel',
@@ -98,7 +122,6 @@ class {'midonet::mem':
       notify  => Service['apache2'],
       tag     => 'a2enmod-mem'
   }
-
   exec { 'a2enmod ssl':
       path    => '/usr/bin:/usr/sbin:/bin',
       alias   => 'enable-mod-ssl',
@@ -106,37 +129,31 @@ class {'midonet::mem':
       notify  => Service['apache2'],
       tag     => 'a2enmod-mem'
   }
-
 file { 'mem-vhost':
   ensure  => present,
   path    => '/etc/apache2/sites-available/30-midonet-mem.conf',
   content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/vhost_mem_manager.erb'),
 }
-
 exec { 'a2ensite 30-midonet-mem':
     path    => '/usr/bin:/usr/sbin:/bin',
     alias   => 'enable-mem-vhost',
     creates => '/etc/apache2/sites-enabled/30-midonet-mem.conf',
     notify  => Service['apache2'],
 }
-
 Exec<| tag == 'a2enmod-mem' |>
 -> File['mem-vhost']
 -> Exec['a2ensite 30-midonet-mem']
-
 if ($is_insights)
 {
   # HA proxy configuration
   Haproxy::Service        { use_include => true }
   Haproxy::Balancermember { use_include => true }
-
   Openstack::Ha::Haproxy_service {
     server_names        => keys($controllers_mgmt_ips),
     ipaddresses         => values($controllers_mgmt_ips),
     public_virtual_ip   => $public_vip,
-    internal_virtual_ip => $management_vip
+    internal_virtual_ip => $management_vip,
   }
-
   openstack::ha::haproxy_service { 'midonetsubscriptions':
     order                  => 200,
     listen_port            => 8007,
@@ -150,7 +167,6 @@ if ($is_insights)
     },
     balancermember_options => 'check',
   }
-
   openstack::ha::haproxy_service { 'midonettrace':
     order                  => 201,
     listen_port            => 8460,
@@ -164,7 +180,6 @@ if ($is_insights)
     },
     balancermember_options => 'check',
   }
-
   openstack::ha::haproxy_service { 'midonetfabric':
     order                  => 202,
     listen_port            => 8009,
@@ -178,7 +193,6 @@ if ($is_insights)
     },
     balancermember_options => 'check',
   }
-
   exec { 'haproxy reload':
     command   => 'export OCF_ROOT="/usr/lib/ocf"; (ip netns list | grep haproxy) && ip netns exec haproxy /usr/lib/ocf/resource.d/fuel/ns_haproxy reload',
     path      => '/usr/bin:/usr/sbin:/bin:/sbin',
@@ -188,28 +202,22 @@ if ($is_insights)
     try_sleep => 10,
     returns   => [0, ''],
   }
-
   Haproxy::Listen <||> -> Exec['haproxy reload']
   Haproxy::Balancermember <||> -> Exec['haproxy reload']
-
   class { 'firewall': }
-
   firewall {'504 Midonet subscription':
     port   => '8007',
     proto  => 'tcp',
     action => 'accept',
   }
-
   firewall {'505 Midonet trace':
     port   => '8460',
     proto  => 'tcp',
     action => 'accept',
   }
-
   firewall {'506 Midonet fabric':
     port   => '8009',
     proto  => 'tcp',
     action => 'accept',
   }
-
 }

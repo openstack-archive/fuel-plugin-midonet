@@ -200,6 +200,8 @@
   - firewall
   - primary-cluster-haproxy
   - cluster-haproxy
+  cross-depends:
+    - name: zookeeper_and_cassandra_midonet
   version: 2.0.0
   type: puppet
   reexecute_on:
@@ -821,6 +823,24 @@
     timeout: 720
   condition:
     yaql_exp: "$.midonet.mem = true"
+
+- id: mem-horizon-enable-lb
+  role:
+  - controller
+  - primary-controller
+  required_for:
+  - post_deployment_end
+  requires:
+  - post_deployment_start
+  - mem-install
+  version: 2.0.0
+  reexecute_on:
+    - deploy_changes
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-horizon-lb-firewall.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 720
 
 - id: mem-restart-cluster
   role:

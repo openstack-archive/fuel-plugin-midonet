@@ -12,10 +12,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 notice('MODULAR: midonet-install-cluster.pp')
-
 # Extract data from hiera
 $ssl_hash                   = hiera_hash('use_ssl', {})
-
 $midonet_settings           = hiera('midonet')
 $net_metadata               = hiera_hash('network_metadata')
 $controllers_map            = get_nodes_hash_by_roles($net_metadata, ['controller', 'primary-controller'])
@@ -33,14 +31,11 @@ $mem                        = $midonet_settings['mem']
 $admin_identity_protocol    = get_ssl_property($ssl_hash, {}, 'keystone', 'admin', 'protocol', 'http')
 $metadata_hash              = hiera_hash('quantum_settings', {})
 $metadata_secret            = pick($metadata_hash['metadata']['metadata_proxy_shared_secret'], 'root')
-
 $ana_hash               = get_nodes_hash_by_roles($net_metadata, ['midonet-analytics'])
 $ana_mgmt_ip_hash       = get_node_to_ipaddr_map_by_network_role($ana_hash, 'management')
 $ana_mgmt_ip_list       = values($ana_mgmt_ip_hash)
 $ana_keys               = keys($ana_hash)
-
 $ana_mgmt_ip            = empty($ana_keys)? {true => $public_vip , default => $ana_mgmt_ip_list[0] }
-
 $insights               = $midonet_settings['mem_insights']
 
 include ::stdlib
@@ -59,18 +54,15 @@ class {'::midonet::cluster':
   max_heap_size        => '2048M',
   heap_newsize         => '1024M'
 }
-
 # HA proxy configuration
 Haproxy::Service        { use_include => true }
 Haproxy::Balancermember { use_include => true }
-
 Openstack::Ha::Haproxy_service {
   server_names        => keys($controllers_mgmt_ips),
   ipaddresses         => values($controllers_mgmt_ips),
   public_virtual_ip   => $public_vip,
-  internal_virtual_ip => $management_vip
+  internal_virtual_ip => $management_vip,
 }
-
 openstack::ha::haproxy_service { 'midonetcluster':
   order                  => 199,
   listen_port            => 8181,
@@ -84,7 +76,6 @@ openstack::ha::haproxy_service { 'midonetcluster':
   },
   balancermember_options => 'check',
 }
-
 exec { 'haproxy reload':
   command   => 'export OCF_ROOT="/usr/lib/ocf"; (ip netns list | grep haproxy) && ip netns exec haproxy /usr/lib/ocf/resource.d/fuel/ns_haproxy reload',
   path      => '/usr/bin:/usr/sbin:/bin:/sbin',
@@ -94,12 +85,9 @@ exec { 'haproxy reload':
   try_sleep => 10,
   returns   => [0, ''],
 }
-
 Haproxy::Listen <||> -> Exec['haproxy reload']
 Haproxy::Balancermember <||> -> Exec['haproxy reload']
-
 class { 'firewall': }
-
 firewall {'502 Midonet cluster':
   port   => '8181',
   proto  => 'tcp',

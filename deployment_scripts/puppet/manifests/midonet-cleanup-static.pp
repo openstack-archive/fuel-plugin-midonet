@@ -14,7 +14,6 @@ if($old_config != 'notfound')
     $access_data           = $old_config['access']
     $keystone_admin_tenant = $access_data['tenant']
     $net_metadata          = $old_config['network_metadata']
-    $node_roles            = $net_metadata['nodes'][$::hostname]['node_roles']
     $neutron_settings      = $old_config['quantum_settings']
     $external_net_name     = $neutron_settings['default_floating_net']
     $tenant_net_name       = $neutron_settings['default_private_net']
