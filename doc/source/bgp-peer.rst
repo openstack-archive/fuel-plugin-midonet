@@ -2,6 +2,8 @@
 
    PageBreak oneColumn
 
+.. _bgp_peer:
+
 Appendix C - Setting up test BGP peer
 =====================================
 
