@@ -39,7 +39,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'fuel-midonet-plugin'
 copyright = u'2016, Midokura SARL'
-version = '4.0.0'
+version = '4.1.0'
 release = version[:3] + '-' + version + '-1'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -75,7 +75,7 @@ latex_documents = [
 
 latex_elements = { 'classoptions': ',openany,oneside', 'babel' : '\\usepackage[english]{babel}' }
 
-pdf_documents = [(master_doc, project, u'MidoNet plugin for Fuel 8', copyright),]
+pdf_documents = [(master_doc, project, u'MidoNet plugin for Fuel 9', copyright),]
 pdf_inline_footnotes = True
 
 # Example configuration for intersphinx: refer to the Python standard library.

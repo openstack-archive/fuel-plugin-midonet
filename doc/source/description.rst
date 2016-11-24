@@ -1,6 +1,6 @@
-.. |FuelVer|        replace:: 8.0
-.. |PrevPluginVer|  replace:: 3.0.1
-.. |PluginVer|      replace:: 4.0.0
+.. |FuelVer|        replace:: 9.0/9.1
+.. |PrevPluginVer|  replace:: 4.0.0
+.. |PluginVer|      replace:: 4.1.0
 
 .. raw:: pdf
 
@@ -15,13 +15,13 @@ for Infrastructure-as-a-Service (IaaS) clouds. Plugin for Fuel |FuelVer| provide
 puppet manifests to install all the components to deploy easily MidoNet with
 Fuel in both lab or production environments.
 
-Fuel MidoNet plugin is capable of deploying MidoNet v2015.06_ on top of Mirantis
+Fuel MidoNet plugin is capable of deploying MidoNet v5.2_ on top of Mirantis
 OpenStack Fuel version |FuelVer|. There are no prerequisites to use the MidoNet
 plugin: MidoNet is Open Source, and the plugin sets the repositories from where
 download and install MidoNet packages.
 
-This plugin also supports Midokura Enterprise MidoNet (MEM_) installation by
-allowing the user to choose the option from the Fuel Web UI.
+This plugin also supports installation of same version of Midokura Enterprise
+MidoNet (MEM_) by allowing the user to choose the option from the Fuel Web UI.
 The packages are available to download from a password protected-repository.
 The needed credentials will be provided_ by Midokura.
 
@@ -40,17 +40,11 @@ MidoNet plugin for Fuel |PluginVer|
 Known Limitations
 -----------------
 
-* The plugin has some limitations regarding node count scalability for NSDB
-  (Network State Database) nodes. Once number of nodes with such role have been
-  determined on initial deployment, it can not be changed. Controller and
-  Compute role nodes are not affected by this limitation, current plugin
-  version supports Controller and Compute scalability.
+* The plugin has some limitations regarding node count regarding
+  Analytics/Insight MEM-only feature. Currently, only one such node can be
+  deployed.
 
-* Current version of plugin can only deploy single MidoNet Gareway role node.
-  MidoNet itself supports any number of gateway nodes, it is only a plugin
-  limitation, additional gateways needs to be set up manually. 
-
-.. _v2015.06: https://github.com/midonet/midonet/releases/tag/v2015.06.3
+.. _v5.2: https://github.com/midonet/midonet/tree/v5.2.1
 .. _MEM: http://docs.midokura.com/docs/latest/manager-guide/content/index.html
 .. _provided: http://www.midokura.com/mem-eval
 
@@ -58,12 +52,17 @@ Known Limitations
 Changes in MidoNet plugin |PluginVer|
 -------------------------------------
 
-* New features:
+New features:
 
+ * Support for MidoNet 5.2 including all MEM features
  * Support for Fuel |FuelVer|
- * Tasks are included in the ``deployment`` stage of Fuel instead of in the
-   ``post_deployment``, so the time of deployment has decreased around 20-30
-   minutes, as well as it makes the deployment more reliable.
- * **MidoNet** option available in the *Networking Setup* during the environment
-   creation, making the configuration of an environment with MidoNet much
-   easier.
+ * support for deploying MidoNet manager web-app on controller nodes
+ * Support for arbitrary number of BGP gateway nodes
+ * Support for static, non-BGP gateway
+
+
+
+
+
+
+

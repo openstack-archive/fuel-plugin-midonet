@@ -1,26 +1,17 @@
-
 .. raw:: pdf
-
-   PageBreak oneColumn
-
 
 MidoNet Fuel Plugin User Guide
 ==============================
 
-Once the Fuel MidoNet plugin has been installed (following
-:ref:`Installation Guide <installation_guide>`), you can create *OpenStack* environments that use
-MidoNet SDN controller as a Neutron back-end.
-
-MidoNet Networks
-----------------
+Short Introduction to MidoNet
+-----------------------------
 
 MidoNet changes the behaviour of default Neutron deployments, understanding
 what MidoNet plugin does, especially in regard to external networks, is
-essential to configure and use MidoNet Fuel plugin properly.
-
-MidoNet plugin is compatible with both **Neutron + GRE** and
-**Neutron + VxLAN** network tunnelling overlays, so let's focus on showing
-the differences between the Neutron default ML2 deployments first.
+essential to configure and use MidoNet Fuel plugin properly. MidoNet plugin is
+compatible with both **Neutron + GRE** and **Neutron + VxLAN** network
+tunnelling overlays, so let's focus on showing the differences between the
+Neutron default ML2 deployments first.
 
 Neutron without MidoNet plugin
 ``````````````````````````````
@@ -30,7 +21,8 @@ Fuel 7.0 reference architecture contains some useful information in
 Neutron-default ML2 topolgy:
 
 .. image:: ../images/fuelml2gre.png
-   :width: 100%
+   :width: 70%
+   :align: center
 
 In this topology, red, or "North" network represents the Public Internet,
 including Floating IP subnet assigned to OpenStack cloud. That means API access
@@ -57,13 +49,14 @@ Even the Floating IPs live in the network overlay. Floating IP subnet is
 separated from the services API network range (called Public Network on Fuel
 and represented by the red network below) and MidoNet gateway advertises the
 routes that belong to Floating Ranges to BGP peers. So MidoNet plugin forces
-you to define a new Network on its settings, and allocation-range from
+user to define a new Network on its settings, and allocation-range from
 environment settings get overridden.
 
 MidoNet deployment topology:
 
 .. image:: ../images/midonet_fuel.png
-   :width: 100%
+   :width: 75%
+   :align: center
 
 On this topology diagram:
 
@@ -88,24 +81,46 @@ On this topology diagram:
   this guide (and Neutron & MidoNet itself).
 
 
-MidoNet gateway is native distributed system, one can place as many gateways
-necessary, so North-South traffic can be distributed and balanced (Although due
-plugin limitation you can only deploy one). Once BGP sessions are established
-and routes are exchanged between BGP "peers", each North-to-South network packet
-gets routed from the External Public API network to one of the MidoNet gateways.
+MidoNet gateway in its BGP mode of operation is a native distributed system,
+one can place as many BGP gateways as necessary, so North-South traffic can be
+distributed and balanced. Once BGP sessions are established and routes are
+exchanged between BGP peers, each North-to-South network packet gets routed
+from the External Public API network to one of the MidoNet gateways.
 It does not matter which of them gets the packet, they work as if they are a
 single entity. MidoNet gateway sends the inbound packet directly to the Compute
 that hosts the target virtual machine.
 
 In this way controller nodes gets significantly less overloaded, since they
-only need to answer user requests and they don't handle VM traffic at all
-(the only exception is the metadata traffic at VM provisioning time).
+only need to answer user requests and they don't handle VM traffic at all.
+
+Another MidoNet gateway mode of operation is to set up a single static routing
+gateway, conceptually similar to the simple hardware gareway routers. Although
+the plugin supports such setup, it would only establish one such gateway,
+and consequently no redundancy or traffic balancing will be supported. This
+kind of gateway setup is not recommanded in production and mission-critical
+deployments, but may be suitable for lab or proof-of-concept deployments.
 
 Following the learned concepts, we are ready to create a Fuel environment
 that uses MidoNet.
 
 
-Select Environment
+MidoNet MEM Insights
+````````````````````
+The Midokura Enterprise MidoNet (MEM) add-ons offer additional functionalities
+on top of the core MidoNet features, including Flow Tracing and Big Data
+Analytics support. These tools provide means to collect system information that
+can be used by the operator to visualize the network behavior.
+
+These, as well as many other features are accessible via MidoNet manager,
+a WEB front-end application that can manage many aspects of MidoNet network
+topology that are usually not available in OpenStack or Neutron, provide
+detailed visualization of network usage as well as provide important
+troubleshooting tool. For more details see
+`Midokura Enterprise MidoNet (MEM) MidoNet Manager Guide`_ and
+`Midokura Enterprise MidoNet (MEM) Insights Guide`_
+
+
+Create Environment
 ------------------
 
 #. When creating the environment in the Fuel UI wizard, choose **Neutron with
@@ -113,15 +128,16 @@ Select Environment
 
    .. image:: ../images/tunneling.png
       :width: 75%
+      :align: center
 
    After that, one will be able to choose between *GRE* or *VXLAN* encapsulation
-   (WEB interface; Settings, Other section). MidoNet works with both of the
+   (Fuel WEB interface; Settings, Other section). MidoNet works with both of the
    encapsulation technologies, but VXLAN may offer better performance,
    especially for the deployments of a larger scale.
 
 #. MidoNet plugin does not interact with the rest of the options, so choose
    whatever your deployment demands on them. Follow instructions from the
-   `official Mirantis OpenStack documentation`_ to finish the configuration.
+   `official OpenStack Fuel documentation`_ to finish the configuration.
 
 
 Configure MidoNet Plugin
@@ -132,6 +148,7 @@ go to the *Other* section:
 
    .. image:: ../images/other.png
       :width: 75%
+      :align: center
 
 Install Midokura Enterprise MidoNet (Optional)
 ``````````````````````````````````````````````
@@ -139,14 +156,15 @@ Install Midokura Enterprise MidoNet (Optional)
 #. Installing Midokura Enterprise MidoNet, you will be able to use some specific
    features from MidoNet only available on the Enterprise version.
 
-#. Activate the option **Install Midokura Enterprise MidoNet**.
+#. Activate the option **Install Midokura Enterprise MidoNet**. Optionally,
+   activate Insights features if desired. Select the Midokura Enterprise
+   MidoNet (MEM) version (currently this plugin supports only MEM 5.2).
 
    .. image:: ../images/mem.png
       :width: 75%
 
-#. Select the Midokura Enterprise MidoNet (MEM) version (only 1.9 available now)
-   and fill the **Username** and **Password** fields for downloading the
-   packages from the repository.
+#. Fill the MEM repository **Username** and **Password** fields required for
+   downloading the MEM packages from the repository.
 
    .. image:: ../images/mem_credentials.png
       :width: 75%
@@ -174,44 +192,62 @@ filled by default, but you will need to change them for sure):
       :width: 75%
 
 
-Configuring the floating fields in *MidoNet plugin*, you will override most of the
-options of the *Neutron L3/Floating Network Parameters* section of the
-*Networks* tab of the environment:
-
-   .. image:: ../images/overridden_options.png
-      :width: 75%
+Configuring the floating fields in *MidoNet plugin*, you will override most of
+the options of the *Neutron L3/Floating Network Parameters* section of the
+*Networks* tab of the environment.
 
 So this *Floating IP range* (first row) will be completely ignored. This
-range has to match with the *CIDR* of the *Public Network*:
-
-   .. image:: ../images/public_network.png
-      :width: 75%
-
-Which only will be used for API-accessible IPs to the OpenStack services but not
-for Virtual Machine's floating IPs.  Please refer to `Neutron with Midonet
+range has to match with the *CIDR* of the *Public Network*, Which only will be
+used for API-accessible IPs to the OpenStack services but not for Virtual
+Machine's floating IPs.  Please refer to `Neutron with Midonet
 plugin`_ section of this document if it is not clear enough to you.
 
-Configure BGP
-`````````````
+Configure the Gateway
+`````````````````````
 
-Fill the BGP attributes:
-
+#. Here we have three options, first of which is to configure the arbitrary number
+of BGP gateways. For this one needs to fill the BGP attributes properly:
 
    .. image:: ../images/bgp_params.png
       :width: 75%
 
-There is a nice tutorial in this document: **Setting up test BGP peer** to run a
-BGP peer for testing environments.
+Special attention needs to be given to a formatting of a **BGP Peers** field.
+This field can supply a comma-separated list of a BGP pairs, where each pair
+is defined as:
+
+   ::
+
+    <local-peer-IP>/<bit-length-of-the-net-prefix>-<external-peer-IP>-<remote-AS>
+
+Note that under normal conditions, local BGP peer means "local to MidoNet
+deployment" and remote BGP peer means external, BGP router peer located at
+the physical network underlay. In case one needs to set up external BGP peer
+to test the MidoNet BGP gateway functionality, we provide the simple tutorial
+at :ref:`Appendix C - Setting up test BGP peer <bgp_peer>`.
+
+#. Second option is to tell MidoNet Fuel plugin to setup a single static routing
+gateway, conceptually similar to the simple hardware gareway routers. For this
+to work one needs to supply routing IP addresses, one for a routing interface
+on an "external" side (LinuxBridge address on a server that is running MidoNet
+gateway agent software) and one at "internal" virtual Edge Router. For example:
+
+   .. image:: ../images/static_gw_params.png
+      :width: 85%
+
+#. Finnaly, last option is to leave gateway configurationto be done completely
+manually. Such use case may be neccessary for complex deployments with
+multiple gateways of various types.
 
 
 Assign Roles to Nodes
 ---------------------
 
-#. Go to the *Nodes* tab and you will see the **Network State DataBase** and
-   **MidoNet HA Gateway** roles available to be assigned to roles.
+#. Go to the *Nodes* tab and you will see the **Network State Database** and
+   **MidoNet HA Gateway** roles available to be assigned to roles. Optionally,
+   **MidoNet Analytics Node** as well.
 
    .. image:: ../images/nodes_to_roles.png
-      :width: 75%
+      :width: 85%
 
 #. Some general advice to be followed:
 
@@ -221,7 +257,7 @@ Assign Roles to Nodes
 
 
 Fuel will force you to choose at least one **NSDB** node in your environment (3
-are recommended). 
+are recommended).
 
 
 Finish environment configuration
@@ -245,9 +281,9 @@ For advanced networking features supported by MidoNet please
 see `MidoNet Operations Guide`_. For general MidoNet troubleshooting, assuming
 the deployment went fine, please see `MidoNet Troubleshooting Guide`_.
 
-.. _MidoNet Operations Guide: https://docs.midonet.org/docs/v2015.06/en/operations-guide/content/index.html
-.. _MidoNet Troubleshooting Guide: https://docs.midonet.org/docs/v2015.06/en/troubleshooting-guide/content/index.html
-.. _`Connectivity Check`: https://docs.mirantis.com/openstack/fuel/fuel-8.0/operations.html#network-issues
+.. _MidoNet Operations Guide: https://docs.midonet.org/docs/v5.2/en/operations-guide/content/index.html
+.. _MidoNet Troubleshooting Guide: https://docs.midonet.org/docs/v5.2/en/troubleshooting-guide/content/index.html
+.. _`Connectivity Check`: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/configure-environment/verify-networks.html
 
 
 
@@ -278,4 +314,8 @@ from happening on re-deployment.
 
 
 .. _`Neutron Network Topologies`: https://docs.mirantis.com/openstack/fuel/fuel-7.0/reference-architecture.html#neutron-with-gre-segmentation-and-ovs
-.. _`official Mirantis OpenStack documentation`: https://docs.mirantis.com/openstack/fuel/fuel-7.0/user-guide.html#create-a-new-openstack-environment
+.. _`official OpenStack Fuel documentation`: http://docs.openstack.org/developer/fuel-docs/userdocs/fuel-user-guide/create-environment/start-create-env.html
+.. _`Midokura Enterprise MidoNet (MEM) MidoNet Manager Guide`: http://docs.midokura.com/docs/latest-en/manager-guide/content/index.html
+.. _`Midokura Enterprise MidoNet (MEM) Insights Guide`: http://docs.midokura.com/docs/latest-en/insights-guide/content/index.html
+
+

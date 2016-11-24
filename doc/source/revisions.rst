@@ -1,6 +1,6 @@
-.. |FuelVer|        replace:: 8.0
-.. |PrevPluginVer|  replace:: 3.0.1
-.. |PluginVer|      replace:: 4.0.0
+.. |FuelVer|        replace:: 9.0/9.1
+.. |PrevPluginVer|  replace:: 4.0.0
+.. |PluginVer|      replace:: 4.1.0
 
 Document purpose
 ================
@@ -28,6 +28,9 @@ Revision history
 
                            (jaume@midokura.com)
    4.1      09.05.2016     Samir Ibradzic             Formatting changes
+
+                           (samir@midokura.com)
+   4.2      11.11.2016     Samir Ibradzic             Adapt to Fuel 9
 
                            (samir@midokura.com)
 ========= =============== ========================== =========================
