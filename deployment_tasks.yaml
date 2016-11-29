@@ -651,8 +651,6 @@
   - tunnel-zones-midonet
   reexecute_on:
     - deploy_changes
-  required_for:
-  - openstack-network-end
   version: 2.0.0
   type: puppet
   parameters:
