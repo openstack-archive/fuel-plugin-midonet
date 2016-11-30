@@ -32,7 +32,7 @@ class { '::midonet_openstack::profile::zookeeper::midozookeeper':
 
 class {'::midonet_openstack::profile::cassandra::midocassandra':
   seeds        => join(values($nsdb_mgmt_map),','),
-  seed_address => $nsdb_mgmt_map["${::hostname}"],
+  seed_address => $zoo_hash["${::fqdn}"]['host'],
   require      => File['/usr/java/default']
 }
 
