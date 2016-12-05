@@ -533,7 +533,6 @@
 - id: enable_nova_compute_service
   type: skipped
 
-
 # POST-DEPLOYMENT TASKS
 
 # The task configure_default_route reinstalls openvswitch-switch
@@ -891,6 +890,24 @@
     timeout: 720
   condition:
     yaql_exp: "$.midonet.mem = true and $.midonet.mem_insights = true"
+
+# Kill the unneccessary agents the hard way
+- id: openstack-network-disable-services
+  role:
+  - primary-controller
+  - controller
+  requires:
+    - post_deployment_start
+  reexecute_on:
+    - deploy_changes
+  required_for:
+  - post_deployment_end
+  version: 2.0.0
+  type: puppet
+  parameters:
+    puppet_manifest: puppet/manifests/midonet-disable-services.pp
+    puppet_modules: "puppet/modules/:/etc/puppet/modules/"
+    timeout: 1440
 
 # In the end..
 
