@@ -18,5 +18,5 @@ $mem = $midonet_settings['mem']
 
 file {'/etc/hiera/plugins/midonet.yaml':
     ensure => file,
-    source => '/etc/fuel/plugins/midonet-4.1/puppet/files/midonet.yaml'
+    source => '/etc/fuel/plugins/midonet-9.2/puppet/files/midonet.yaml'
 }

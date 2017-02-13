@@ -36,26 +36,35 @@ attributes:
         strict: false
         message: "Midokura Enterprise MidoNet (MEM) must be enabled"
 
-  mem_version:
-    value: "5.2"
-    label: "MEM release version"
-    description: "Choose the Midokura Enterprise MidoNet (MEM) release version"
-    type: "select"
+  vm_install:
+    value: false
+    label: "Are you installing the Analytics nodes on VM's?"
+    description: "If selected, it will install haveged package for entropy. DONT CHECK IF USING BARE-METAL SERVERS"
     weight: 8
+    type: "checkbox"
+    restrictions:
+      - condition: "settings:midonet.mem_insights.value == false or settings:midonet.midonet_version == '5.2'"
+        message: "Midokura Enterprise MidoNet (MEM) must be enabled"
+        action: hide
+
+  midonet_version:
+    value: "5.4"
+    label: "MidoNet release version"
+    description: "Choose the MidoNet release version"
+    type: "select"
+    weight: 9
     values:
       - data: "5.2"
         label: "5.2"
-    restrictions:
-      - condition: "settings:midonet.mem.value == false"
-        strict: false
-        message: "Midokura Enterprise MidoNet (MEM) must be enabled"
+      - data: "5.4"
+        label: "5.4"
 
   mem_repo_user:
     value: ''
     label: "MEM repository username"
     description: "Username for Midokura Enterprise MidoNet (MEM) repository"
     type: "text"
-    weight: 9
+    weight: 10
     restrictions:
       - condition: "settings:midonet.mem.value == false"
         strict: false
@@ -66,7 +75,7 @@ attributes:
     label: "MEM repository password"
     description: "Password for Midokura Enterprise MidoNet (MEM) repository"
     type: "password"
-    weight: 10
+    weight: 11
     restrictions:
       - condition: "settings:midonet.mem.value == false"
         strict: false
@@ -74,7 +83,7 @@ attributes:
 
   tunnel_type:
     type: "select"
-    weight: 11
+    weight: 12
     value: "gre"
     label: "Tunnel Type"
     description: "Choose which technology MidoNet will use to encapsulate data between hosts"

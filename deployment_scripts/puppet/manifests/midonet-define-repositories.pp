@@ -15,10 +15,10 @@ notice('MODULAR: midonet-define-repositories.pp')
 
 $midonet_settings  = hiera('midonet')
 $mem               = $midonet_settings['mem']
-$mem_version       = $midonet_settings['mem_version']
+$mem_version       = $midonet_settings['midonet_version']
 $mem_user          = $midonet_settings['mem_repo_user']
 $mem_password      = $midonet_settings['mem_repo_password']
-$midonet_version   = '5.2'
+$midonet_version   = $midonet_settings['midonet_version']
 $openstack_release = 'mitaka'
 
 include apt
@@ -27,7 +27,7 @@ include midonet::params
 
 
 if $mem {
-  $midonet_repo_url = "http://${mem_user}:${mem_password}@${midonet::params::midonet_repo_baseurl}/mem-${mem_version}"
+  $midonet_repo_url = "http://${midonet::params::midonet_repo_baseurl}/midonet-${midonet_version}"
 }
 else {
   $midonet_repo_url = "http://${midonet::params::midonet_repo_baseurl}/midonet-${midonet_version}"
@@ -41,7 +41,20 @@ apt::key { 'midorepo':
 apt::source {'midonet':
     comment  => 'Midonet apt repository',
     location => $midonet_repo_url,
-    release  => 'stable',
+    release  => 'unstable',
+    key      => {
+          'id'     => 'E9996503AEB005066261D3F38DDA494E99143E75',
+          'server' => 'subkeys.pgp.net',
+    },
+    include  => {
+          'src' => false,
+  }
+} ->
+
+apt::source {'midonet-mem':
+    comment  => 'Midonet mem apt repository',
+    location => 'http://artifactory.bcn.midokura.com/artifactory/mem-5.4-deb/',
+    release  => 'unstable',
     key      => {
           'id'     => 'E9996503AEB005066261D3F38DDA494E99143E75',
           'server' => 'subkeys.pgp.net',

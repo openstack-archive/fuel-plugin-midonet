@@ -62,7 +62,7 @@ if($old_config != 'notfound')
     file { 'delete router interfaces script':
       ensure  => present,
       path    => '/tmp/delete_router_interfaces_bgp.sh',
-      content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/delete_router_interfaces_bgp.sh.erb'),
+      content => template('/etc/fuel/plugins/midonet-9.2/puppet/templates/delete_router_interfaces_bgp.sh.erb'),
     }
 
     # Finally, execute the script

@@ -4,13 +4,18 @@ if [[ -e /etc/puppet/modules/neutron/lib/puppet/type/neutron_plugin_midonet.rb ]
   cd /etc/puppet/modules/neutron && patch -p1 --force --forward < midonet.diff  && cd -
 fi
 
-if [[ -e lib/puppet/provider/neutron_port/neutron.rb ]]; then
-  # Apply the released patch of Neutron Puppet to allow midonet manifests
-  wget https://github.com/openstack/puppet-neutron/commit/dcfb3dd946cbc6f6083afa35f023917dfe0369e4.diff -O /etc/puppet/modules/neutron/midonet2.diff
-  cd /etc/puppet/modules/neutron && patch -p1 --force  --forward < midonet2.diff  && cd -
+# Dirty way of checking if the neutron type is already patched. It is not possible to get
+# version Of the current fuel version from a node.
+NEUTRONTYPEPATCHED=$(cat /etc/puppet/modules/neutron/lib/puppet/type/neutron_port.rb | grep binding_host_id | head -n1)
+if [[ -z ${NEUTRONTYPEPATCHED} ]]; then
+  if [[ -e /etc/puppet/modules/neutron/lib/puppet/provider/neutron_port/neutron.rb ]]; then
+    # Apply the released patch of Neutron Puppet to allow midonet manifests
+    wget https://github.com/openstack/puppet-neutron/commit/dcfb3dd946cbc6f6083afa35f023917dfe0369e4.diff -O /etc/puppet/modules/neutron/midonet2.diff
+    cd /etc/puppet/modules/neutron && patch -p1 --force  --forward < midonet2.diff  && cd -
+  fi
 fi
 
-if [[ -e lib/puppet/type/neutron_network.rb ]]; then
+if [[ -e /etc/puppet/modules/neutron/lib/puppet/type/neutron_network.rb ]]; then
   # Apply the released patch of Neutron Puppet to allow midonet manifests
   wget https://github.com/openstack/puppet-neutron/commit/95f0514a8ef6f5491d7e5775553d234435354cf8.diff -O /etc/puppet/modules/neutron/midonet3.diff
   cd /etc/puppet/modules/neutron && patch -p1 --force --forward < midonet3.diff  && cd -

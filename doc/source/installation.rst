@@ -25,9 +25,9 @@ To install the MidoNet Fuel plugin:
    ::
 
     # fuel plugins
-    id | name    | version | package_version | releases           
+    id | name    | version | package_version | releases
     ---+---------+---------+-----------------+--------------------
-    1  | midonet | 4.1.0   | 4.0.0           | ubuntu (mitaka-9.0)
+    1  | midonet | 9.2.0   | 4.0.0           | ubuntu (mitaka-9.0)
 
 
 .. _`Partner Community Catalog`: https://www.mirantis.com/partners/midokura/

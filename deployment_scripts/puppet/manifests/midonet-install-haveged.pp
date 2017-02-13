@@ -11,10 +11,8 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-notice('MODULAR: midonet-edge-router-cleanup-bgp-gw.pp')
+notice('MODULAR: midonet-install-haveged.pp')
 
-
-  file {'/etc/init/midonet-network.conf':
-    ensure => absent,
-    source => '/etc/fuel/plugins/midonet-9.2/puppet/files/startup.conf'
-  }
+package { 'haveged':
+  ensure => present,
+}

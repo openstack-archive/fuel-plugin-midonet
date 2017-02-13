@@ -54,6 +54,12 @@ service { 'libvirt' :
   provider => $nova::params::special_service_provider,
 }
 
+firewall { '999 accept all to metadata interface':
+  proto   => 'all',
+  iniface => 'metadata',
+  action  => 'accept',
+}
+
 exec { 'destroy_libvirt_default_network':
   command => 'virsh net-destroy default',
   onlyif  => 'virsh net-info default | grep -qE "Active:.* yes"',
@@ -88,6 +94,7 @@ nova_config {
   'DEFAULT/linuxnet_ovs_integration_bridge': value => $neutron_integration_bridge;
   'DEFAULT/network_device_mtu':              value => '65000';
   'DEFAULT/my_ip':                           value => $nova_migration_ip;
+  'DEFAULT/force_config_drive':              value => 'False';
 }
 
 class { 'nova::network::neutron' :

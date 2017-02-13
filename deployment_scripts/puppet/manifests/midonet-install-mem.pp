@@ -39,6 +39,10 @@ $ana_keys               = keys($ana_hash)
 $ana_mgmt_ip            = empty($ana_keys)? {true => $public_vip , default => $ana_mgmt_ip_list[0] }
 $ssl_horizon            = $public_ssl_hash['horizon']
 $is_insights            = $midonet_settings['mem_insights']
+
+$midonet_version        = $midonet_settings['midonet_version']
+$new_api                = versioncmp($midonet_version,'5.2') ? {'1' => true, default => false}
+
 service { 'apache2':
     ensure     => running,
     enable     => true,
@@ -132,7 +136,7 @@ else {
 file { 'mem-vhost':
   ensure  => present,
   path    => '/etc/apache2/sites-available/30-midonet-mem.conf',
-  content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/vhost_mem_manager.erb'),
+  content => template('/etc/fuel/plugins/midonet-9.2/puppet/templates/vhost_mem_manager.erb'),
 }
 exec { 'a2ensite 30-midonet-mem':
     path    => '/usr/bin:/usr/sbin:/bin',
@@ -145,54 +149,110 @@ Exec<| tag == 'a2enmod-mem' |>
 -> Exec['a2ensite 30-midonet-mem']
 if ($is_insights)
 {
+  if($new_api)
+  {
+    Haproxy::Service        { use_include => true }
+    Haproxy::Balancermember { use_include => true }
+    Openstack::Ha::Haproxy_service {
+      server_names        => keys($controllers_mgmt_ips),
+      ipaddresses         => values($controllers_mgmt_ips),
+      public_virtual_ip   => $public_vip,
+      internal_virtual_ip => $management_vip,
+    }
+    openstack::ha::haproxy_service { 'midonetunified':
+      order                  => 200,
+      listen_port            => 8999,
+      balancermember_port    => 8999,
+      define_backups         => true,
+      before_start           => true,
+      public                 => true,
+      haproxy_config_options => {
+        'balance' => 'roundrobin',
+        'option'  => ['httplog'],
+      },
+      balancermember_options => 'check',
+    }
+    class { 'firewall': }
+    firewall {'504 Midonet Unified Endpoint':
+      port   => '8999',
+      proto  => 'tcp',
+      action => 'accept',
+    }
+  }
+  else
+  {
+    Haproxy::Service        { use_include => true }
+    Haproxy::Balancermember { use_include => true }
+    Openstack::Ha::Haproxy_service {
+      server_names        => keys($controllers_mgmt_ips),
+      ipaddresses         => values($controllers_mgmt_ips),
+      public_virtual_ip   => $public_vip,
+      internal_virtual_ip => $management_vip,
+    }
+    openstack::ha::haproxy_service { 'midonetsubscriptions':
+      order                  => 200,
+      listen_port            => 8007,
+      balancermember_port    => 8007,
+      define_backups         => true,
+      before_start           => true,
+      public                 => true,
+      haproxy_config_options => {
+        'balance' => 'roundrobin',
+        'option'  => ['httplog'],
+      },
+      balancermember_options => 'check',
+    }
+    openstack::ha::haproxy_service { 'midonettrace':
+      order                  => 201,
+      listen_port            => 8460,
+      balancermember_port    => 8460,
+      define_backups         => true,
+      before_start           => true,
+      public                 => true,
+      haproxy_config_options => {
+        'balance' => 'roundrobin',
+        'option'  => ['httplog'],
+      },
+      balancermember_options => 'check',
+    }
+    openstack::ha::haproxy_service { 'midonetfabric':
+      order                  => 202,
+      listen_port            => 8009,
+      balancermember_port    => 8009,
+      define_backups         => true,
+      before_start           => true,
+      public                 => true,
+      haproxy_config_options => {
+        'balance' => 'roundrobin',
+        'option'  => ['httplog'],
+      },
+      balancermember_options => 'check',
+    }
+    class { 'firewall': }
+    firewall {'504 Midonet subscription':
+      port   => '8007',
+      proto  => 'tcp',
+      action => 'accept',
+    }
+    firewall {'505 Midonet trace':
+      port   => '8460',
+      proto  => 'tcp',
+      action => 'accept',
+    }
+    firewall {'506 Midonet fabric':
+      port   => '8009',
+      proto  => 'tcp',
+      action => 'accept',
+    }
+  }
   # HA proxy configuration
-  Haproxy::Service        { use_include => true }
-  Haproxy::Balancermember { use_include => true }
-  Openstack::Ha::Haproxy_service {
-    server_names        => keys($controllers_mgmt_ips),
-    ipaddresses         => values($controllers_mgmt_ips),
-    public_virtual_ip   => $public_vip,
-    internal_virtual_ip => $management_vip,
+
+  file_line { 'Update tunnel timeout on haproxy':
+    path  => '/etc/haproxy/haproxy.cfg',
+    line  => '  timeout  tunnel 3600s',
+    after => '  timeout  check'
   }
-  openstack::ha::haproxy_service { 'midonetsubscriptions':
-    order                  => 200,
-    listen_port            => 8007,
-    balancermember_port    => 8007,
-    define_backups         => true,
-    before_start           => true,
-    public                 => true,
-    haproxy_config_options => {
-      'balance' => 'roundrobin',
-      'option'  => ['httplog'],
-    },
-    balancermember_options => 'check',
-  }
-  openstack::ha::haproxy_service { 'midonettrace':
-    order                  => 201,
-    listen_port            => 8460,
-    balancermember_port    => 8460,
-    define_backups         => true,
-    before_start           => true,
-    public                 => true,
-    haproxy_config_options => {
-      'balance' => 'roundrobin',
-      'option'  => ['httplog'],
-    },
-    balancermember_options => 'check',
-  }
-  openstack::ha::haproxy_service { 'midonetfabric':
-    order                  => 202,
-    listen_port            => 8009,
-    balancermember_port    => 8009,
-    define_backups         => true,
-    before_start           => true,
-    public                 => true,
-    haproxy_config_options => {
-      'balance' => 'roundrobin',
-      'option'  => ['httplog'],
-    },
-    balancermember_options => 'check',
-  }
+
   exec { 'haproxy reload':
     command   => 'export OCF_ROOT="/usr/lib/ocf"; (ip netns list | grep haproxy) && ip netns exec haproxy /usr/lib/ocf/resource.d/fuel/ns_haproxy reload',
     path      => '/usr/bin:/usr/sbin:/bin:/sbin',
@@ -202,22 +262,12 @@ if ($is_insights)
     try_sleep => 10,
     returns   => [0, ''],
   }
-  Haproxy::Listen <||> -> Exec['haproxy reload']
-  Haproxy::Balancermember <||> -> Exec['haproxy reload']
-  class { 'firewall': }
-  firewall {'504 Midonet subscription':
-    port   => '8007',
-    proto  => 'tcp',
-    action => 'accept',
-  }
-  firewall {'505 Midonet trace':
-    port   => '8460',
-    proto  => 'tcp',
-    action => 'accept',
-  }
-  firewall {'506 Midonet fabric':
-    port   => '8009',
-    proto  => 'tcp',
-    action => 'accept',
-  }
+  Haproxy::Listen <||> ->
+  File_line['Update tunnel timeout on haproxy'] ->
+  Exec['haproxy reload']
+
+  Haproxy::Balancermember <||> ->
+  File_line['Update tunnel timeout on haproxy'] ->
+  Exec['haproxy reload']
+
 }

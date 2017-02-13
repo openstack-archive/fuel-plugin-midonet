@@ -42,18 +42,28 @@ $ana_keys               = keys($ana_hash)
 
 $ana_mgmt_ip            = empty($ana_keys)? {true => $public_vip , default => $ana_mgmt_ip_list[0] }
 
+$midonet_version        = $midonet_settings['midonet_version']
+
+$nodes_hash      = hiera('nodes')
+$node            = filter_nodes($nodes_hash, 'fqdn', $::fqdn)
+$priv_ip         = $node[0]['internal_address']
+$priv_netmask    = $node[0]['internal_netmask']
+$pub_ip          = $node[0]['public_address']
 #Add MEM analytics class
 class {'midonet::analytics':
   zookeeper_hosts => $zoo_ips_hash,
   is_mem          => true,
   manage_repo     => false,
   heap_size_gb    => '3',
+  midonet_version => $midonet_version,
+  elk_bind_ip     => $priv_ip,
+  elk_hosts       => $ana_mgmt_ip_list
 }
 
 class { 'firewall': }
 
-firewall {'507 Midonet analytics':
-  port   => '8080',
+firewall {'507 Midonet elk 1':
+  port   => '9200',
   proto  => 'tcp',
   action => 'accept',
 }
@@ -66,6 +76,18 @@ firewall {'508 Midonet clio':
 
 firewall {'509 Midonet flow history':
   port   => '5001',
+  proto  => 'tcp',
+  action => 'accept',
+}
+
+firewall {'520 Midonet elk 2':
+  port   => '9300',
+  proto  => 'tcp',
+  action => 'accept',
+}
+
+firewall {'520 Midonet elk 3':
+  port   => '5005',
   proto  => 'tcp',
   action => 'accept',
 }

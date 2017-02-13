@@ -46,7 +46,7 @@ package { 'python-neutronclient':
 file { 'create router interfaces script':
   ensure  => present,
   path    => '/tmp/create_router_interfaces_static.sh',
-  content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/create_router_interfaces_static.sh.erb'),
+  content => template('/etc/fuel/plugins/midonet-9.2/puppet/templates/create_router_interfaces_static.sh.erb'),
 } ->
 
 # Finally, execute the script

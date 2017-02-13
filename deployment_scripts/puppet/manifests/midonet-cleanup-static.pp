@@ -66,7 +66,7 @@ if($old_config != 'notfound')
     file { 'cleanup static script':
       ensure  => present,
       path    => '/tmp/cleanup_static_gateway.sh',
-      content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/cleanup_static_gateway.sh.erb'),
+      content => template('/etc/fuel/plugins/midonet-9.2/puppet/templates/cleanup_static_gateway.sh.erb'),
     }
 
     # Finally, execute the script
@@ -80,7 +80,7 @@ if($old_config != 'notfound')
     file { 'delete router interfaces script':
       ensure  => present,
       path    => '/tmp/remove_router_interfaces.sh',
-      content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/remove_router_interfaces.sh.erb'),
+      content => template('/etc/fuel/plugins/midonet-9.2/puppet/templates/remove_router_interfaces.sh.erb'),
     }
 
     # Finally, execute the script

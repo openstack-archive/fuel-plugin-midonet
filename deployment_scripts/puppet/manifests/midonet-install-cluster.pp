@@ -38,6 +38,15 @@ $ana_keys               = keys($ana_hash)
 $ana_mgmt_ip            = empty($ana_keys)? {true => $public_vip , default => $ana_mgmt_ip_list[0] }
 $insights               = $midonet_settings['mem_insights']
 
+$midonet_version        = $midonet_settings['midonet_version']
+
+$nodes_hash      = hiera('nodes')
+$node            = filter_nodes($nodes_hash, 'fqdn', $::fqdn)
+$priv_ip         = $node[0]['internal_address']
+$priv_netmask    = $node[0]['internal_netmask']
+$pub_ip          = $node[0]['public_address']
+
+
 include ::stdlib
 class {'::midonet::cluster':
   is_mem               => $mem,
@@ -52,7 +61,14 @@ class {'::midonet::cluster':
   is_insights          => $insights,
   analytics_ip         => $ana_mgmt_ip,
   max_heap_size        => '2048M',
-  heap_newsize         => '1024M'
+  heap_newsize         => '1024M',
+  midonet_version      => $midonet_version,
+  endpoint_host        => $priv_ip,
+  endpoint_port        => '8999',
+  elk_seeds            => join($ana_mgmt_ip_list,','),
+  elk_target_endpoint  => generate_cidr_from_ip_netlength("${priv_ip} ${priv_netmask}"),
+  jarvis_enabled       => false,
+  state_proxy_address  => $priv_ip
 }
 # HA proxy configuration
 Haproxy::Service        { use_include => true }
@@ -90,6 +106,24 @@ Haproxy::Balancermember <||> -> Exec['haproxy reload']
 class { 'firewall': }
 firewall {'502 Midonet cluster':
   port   => '8181',
+  proto  => 'tcp',
+  action => 'accept',
+}
+
+firewall {'503 Midonet cluster state proxy':
+  port   => '2346',
+  proto  => 'tcp',
+  action => 'accept',
+}
+
+firewall {'511 Midonet cluster unified endpoint':
+  port   => '8999',
+  proto  => 'tcp',
+  action => 'accept',
+}
+
+firewall {'521 Midonet flow history':
+  port   => '5001',
   proto  => 'tcp',
   action => 'accept',
 }

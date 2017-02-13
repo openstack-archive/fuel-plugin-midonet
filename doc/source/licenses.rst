@@ -60,13 +60,18 @@ slf4j               http://www.slf4j.org                                MIT
 Puppet Modules
 --------------
 
-====================== ==========
-Name                   License
-====================== ==========
-ripienaar-module_data  Apache 2.0
-deric-zookeeper        Apache 2.0
-midonet-cassandra      Apache 2.0
-puppetlabs-java        Apache 2.0
-puppetlabs-tomcat      Apache 2.0
-midonet-midonet        Apache 2.0
-====================== ==========
+=========================== ====================
+Name                              License
+=========================== ====================
+deric-zookeeper                  Apache 2.0
+midonet-cassandra                Apache 2.0
+puppetlabs-java                  Apache 2.0
+puppetlabs-tomcat                Apache 2.0
+openstack-midonet                Apache 2.0
+midonet-midonet_openstack        Apache 2.0
+TubeMogul-curator                Apache 2.0
+elasticsearch-elasticsearch      Apache 2.0
+elasticsearch-logstash           Apache 2.0
+electrical-file_concat           Apache 2.0
+richardc-datacat                 Apache 2.0
+=========================== ====================

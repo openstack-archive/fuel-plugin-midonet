@@ -26,8 +26,6 @@ midonet-analytics:
   has_primary: false
   public_ip_required: false
   weight: 200
-  limits:
-    max: 1
   conflicts:
     - controller
     - midonet-gw

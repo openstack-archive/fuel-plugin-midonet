@@ -42,6 +42,6 @@ contain ::midonet::gateway::static
 
 file {'/etc/init/midonet-network-static.conf':
   ensure  => present,
-  source  => '/etc/fuel/plugins/midonet-4.1/puppet/files/startup-static.conf',
+  source  => '/etc/fuel/plugins/midonet-9.2/puppet/files/startup-static.conf',
   require => Exec['run gateway static creation script']
 }

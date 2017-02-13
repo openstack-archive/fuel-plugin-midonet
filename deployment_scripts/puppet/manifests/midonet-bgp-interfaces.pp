@@ -34,5 +34,5 @@ exec {'set up external bridge':
 
 file {'/etc/init/midonet-network.conf':
   ensure => present,
-  source => '/etc/fuel/plugins/midonet-4.1/puppet/files/startup.conf'
+  source => '/etc/fuel/plugins/midonet-9.2/puppet/files/startup.conf'
 }

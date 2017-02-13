@@ -1,8 +1,8 @@
 name: midonet
 title: Neutron Midonet Plugin
-version: 4.1.0
+version: 9.2.0
 description: Enable to use plugin Midonet for Neutron
-fuel_version: ['9.0','9.1']
+fuel_version: ['9.0','9.1','9.2']
 is_hotpluggable: false
 
 releases:

@@ -55,7 +55,7 @@ if($old_config != 'notfound')
     file { 'delete masquerade script':
       ensure  => present,
       path    => '/tmp/remove_router_interfaces.sh',
-      content => template('/etc/fuel/plugins/midonet-4.1/puppet/templates/cleanup_masquerade.sh.erb'),
+      content => template('/etc/fuel/plugins/midonet-9.2/puppet/templates/cleanup_masquerade.sh.erb'),
     } ->
 
     # Finally, execute the script

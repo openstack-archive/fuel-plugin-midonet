@@ -1,6 +1,6 @@
-.. |FuelVer|        replace:: 9.0/9.1
-.. |PrevPluginVer|  replace:: 4.0.0
-.. |PluginVer|      replace:: 4.1.0
+.. |FuelVer|        replace:: 9.0/9.1/9.2
+.. |PrevPluginVer|  replace:: 4.1.0
+.. |PluginVer|      replace:: 9.2.0
 
 Document purpose
 ================
@@ -33,4 +33,7 @@ Revision history
    4.2      11.11.2016     Samir Ibradzic             Adapt to Fuel 9
 
                            (samir@midokura.com)
+   9.1      19.01.2017     Alex Ruiz Estradera        Adapt for Midonet 5.4
+
+                           (alex.ruiz@midokura.com)
 ========= =============== ========================== =========================

@@ -43,6 +43,8 @@ $use_syslog             = hiera('use_syslog', true)
 $use_stderr             = hiera('use_stderr', false)
 $verbose                = pick($openstack_network_hash['verbose'], hiera('verbose', true))
 
+$primary_ctrl = hiera('primary_controller')
+
 
 # Unfortunately, core_plugin in the 'openstack-network-common-config'
 # task is hardcoded. The core_plugin value for midonet is overrided
@@ -80,11 +82,6 @@ package {'python-neutron-plugin-midonet':
   ensure => absent
 }
 
-# The real plugin package
-package {'python-networking-midonet':
-  ensure => present
-}
-
 file {'/etc/default/neutron-server':
   ensure => present,
   owner  => 'root',
@@ -97,12 +94,12 @@ class { '::midonet::neutron_plugin':
     keystone_username => $username,
     keystone_password => $password,
     keystone_tenant   => $tenant_name,
-    sync_db           => $primary_controller ? {true => true,default => false},
+    sync_db           => $primary_ctrl ? {true => true,default => false},
   }
 
 
 class { '::neutron::server':
-  sync_db                 => $primary_controller ? {true => 'primary',default => 'slave'},
+  sync_db                 => $primary_ctrl ? {true => 'primary',default => 'slave'},
 
   username                => $neutron_username,
   password                => $neutron_user_password,
