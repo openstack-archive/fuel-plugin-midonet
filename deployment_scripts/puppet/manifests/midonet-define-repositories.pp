@@ -51,19 +51,6 @@ apt::source {'midonet':
   }
 } ->
 
-apt::source {'midonet-mem':
-    comment  => 'Midonet mem apt repository',
-    location => 'http://artifactory.bcn.midokura.com/artifactory/mem-5.4-deb/',
-    release  => 'unstable',
-    key      => {
-          'id'     => 'E9996503AEB005066261D3F38DDA494E99143E75',
-          'server' => 'subkeys.pgp.net',
-    },
-    include  => {
-          'src' => false,
-  }
-} ->
-
 apt::source {'midonet-openstack-integration':
     comment  => 'Midonet apt plugin repository',
     location => "http://${midonet::params::midonet_repo_baseurl}/openstack-${openstack_release}",
