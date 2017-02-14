@@ -27,8 +27,7 @@ include midonet::params
 
 
 if $mem {
-  $midonet_repo_url = "http://${midonet::params::midonet_repo_baseurl}/midonet-${midonet_version}"
-}
+  $midonet_repo_url = "http://${mem_user}:${mem_password}@${midonet::params::midonet_repo_baseurl}/mem-${mem_version}"
 else {
   $midonet_repo_url = "http://${midonet::params::midonet_repo_baseurl}/midonet-${midonet_version}"
 }
