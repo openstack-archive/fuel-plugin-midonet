@@ -1,3 +1,5 @@
+# UUID                                  	Group Name
+#
 0a3c06b704bb2dad5e31920d91f653abe9ce9eae	fuel-plugins-ci
-bd913cb4d97f92a6c011a752caf468b8b3909302	fuel-plugin-midonet-core
 526f2d4c07b7a3abc8d63fea63a5c4df4b648cdb	fuel-plugin-midonet-release
+bd913cb4d97f92a6c011a752caf468b8b3909302	fuel-plugin-midonet-core
