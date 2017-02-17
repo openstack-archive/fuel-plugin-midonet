@@ -19,7 +19,7 @@ To install the MidoNet Fuel plugin:
 
    ::
 
-    # fuel plugins --install midonet-4.1-4.1.0-1.noarch.rpm
+    # fuel plugins --install midonet-9.2-9.2.0-1.noarch.rpm
 
 #. Verify that the plugin is installed correctly:
    ::
