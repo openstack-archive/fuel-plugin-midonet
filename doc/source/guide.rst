@@ -158,7 +158,7 @@ Install Midokura Enterprise MidoNet (Optional)
 
 #. Activate the option **Install Midokura Enterprise MidoNet**. Optionally,
    activate Insights features if desired. Select the Midokura Enterprise
-   MidoNet (MEM) version (currently this plugin supports only MEM 5.2).
+   MidoNet (MEM) version (5.2 or 5.4).
 
    .. image:: ../images/mem.png
       :width: 75%

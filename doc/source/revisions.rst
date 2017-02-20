@@ -33,7 +33,7 @@ Revision history
    4.2      11.11.2016     Samir Ibradzic             Adapt to Fuel 9
 
                            (samir@midokura.com)
-   9.1      19.01.2017     Alex Ruiz Estradera        Adapt for Midonet 5.4
+   9.2      19.01.2017     Alex Ruiz Estradera        Adapt for Midonet 5.4
 
                            (alex.ruiz@midokura.com)
 ========= =============== ========================== =========================
