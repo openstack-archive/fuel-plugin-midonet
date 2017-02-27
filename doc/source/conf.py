@@ -38,8 +38,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'fuel-midonet-plugin'
-copyright = u'2016, Midokura SARL'
-version = '4.1.0'
+copyright = u'2017, Midokura SARL'
+version = '9.2.0'
 release = version[:3] + '-' + version + '-1'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
