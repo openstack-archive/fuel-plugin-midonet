@@ -234,7 +234,7 @@ gateway agent software) and one at "internal" virtual Edge Router. For example:
    .. image:: ../images/static_gw_params.png
       :width: 85%
 
-#. Finnaly, last option is to leave gateway configurationto be done completely
+#. Finnaly, last option is to leave gateway configuration to be done completely
 manually. Such use case may be neccessary for complex deployments with
 multiple gateways of various types.
 
