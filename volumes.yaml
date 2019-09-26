@@ -1,8 +1,0 @@
-volumes_roles_mapping:
-  nsdb:
-    - {allocate_size: "min", id: "os"}
-    - {allocate_size: "all", id: "vm"}
-  midonet-analytics:
-    - {allocate_size: "min", id: "os"}
-    - {allocate_size: "all", id: "vm"}
-volumes: []
